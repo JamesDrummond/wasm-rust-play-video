@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Rust WebAssembly Test</title>
+</head>
+<body>
+    <h1>Rust WebAssembly Test</h1>
+    <div id="result"></div>
+    <script type="module">
+        import init, { greet, add } from './pkg/wasm_rust_cursor_testing.js';
+
+        async function run() {
+            await init();
+            
+            // Test the greet function
+            const greeting = greet("WebAssembly");
+            document.getElementById('result').innerHTML = `
+                <p>${greeting}</p>
+                <p>2 + 3 = ${add(2, 3)}</p>
+            `;
+        }
+
+        run();
+    </script>
+</body>
+</html> 
