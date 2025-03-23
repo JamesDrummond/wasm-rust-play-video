@@ -108,11 +108,17 @@
             is_video_playing,
             is_video_muted,
             is_fullscreen,
-            update_time_display
+            update_time_display,
+            get_wasm_initialized,
+            set_wasm_initialized,
+            get_is_muted,
+            set_is_muted,
+            set_toggle_button_disabled,
+            set_toggle_button_text,
+            set_mute_button_text,
+            set_fullscreen_button_text
         } from './pkg/wasm_rust_play_video.js';
         
-        let wasmInitialized = false;
-        let isMuted = false;
         const errorMessage = document.getElementById('errorMessage');
         const toggleButton = document.getElementById('toggleButton');
         const muteButton = document.getElementById('muteButton');
@@ -122,7 +128,7 @@
         const videoPlayer = document.getElementById('videoPlayer');
 
         async function updateTimeDisplay() {
-            if (!wasmInitialized) return;
+            if (!get_wasm_initialized()) return;
             try {
                 await update_time_display();
             } catch (error) {
@@ -133,49 +139,46 @@
         videoPlayer.addEventListener('timeupdate', updateTimeDisplay);
         videoPlayer.addEventListener('loadedmetadata', updateTimeDisplay);
 
-        window.toggleMute = async function() {
-            if (!wasmInitialized) {
+        fullscreenButton.addEventListener('click', async () => {
+            if (!get_wasm_initialized()) {
                 await show_error('WASM module not initialized');
                 return;
             }
             try {
-                await toggle_mute();
-                const isMuted = await is_video_muted();
-                muteButton.textContent = isMuted ? 'Unmute' : 'Mute';
-                await hide_error();
-            } catch (error) {
-                await show_error(`Failed to toggle mute: ${error.message}`);
-            }
-        };
-
-        window.toggleFullscreen = async function() {
-            if (!wasmInitialized) {
-                await show_error('WASM module not initialized');
-                return;
-            }
-            try {
-                await toggle_fullscreen();
-                const isFullscreenMode = await is_fullscreen();
-                fullscreenButton.textContent = isFullscreenMode ? 'Exit Fullscreen' : 'Fullscreen';
+                await set_fullscreen_button_text();
                 await hide_error();
             } catch (error) {
                 await show_error(`Failed to toggle fullscreen: ${error.message}`);
             }
-        };
+        });
+
+        muteButton.addEventListener('click', async () => {
+            if (!get_wasm_initialized()) {
+                await show_error('WASM module not initialized');
+                return;
+            }
+            try {
+                const isMuted = await toggle_mute();
+                await set_mute_button_text(isMuted);
+                await hide_error();
+            } catch (error) {
+                await show_error(`Failed to toggle mute: ${error.message}`);
+            }
+        });
 
         async function initWasm() {
             try {
                 await init();
-                wasmInitialized = true;
+                set_wasm_initialized(true);
                 await hide_error();
             } catch (error) {
                 await show_error(`Failed to initialize WASM: ${error.message}`);
-                toggleButton.disabled = true;
+                await set_toggle_button_disabled(true);
             }
         }
 
         window.toggleVideo = async function() {
-            if (!wasmInitialized) {
+            if (!get_wasm_initialized()) {
                 await show_error('WASM module not initialized');
                 return;
             }
@@ -183,10 +186,10 @@
                 const isPlaying = await is_video_playing();
                 if (isPlaying) {
                     await pause_video();
-                    toggleButton.textContent = 'Play';
+                    await set_toggle_button_text('Play');
                 } else {
                     await play_video();
-                    toggleButton.textContent = 'Pause';
+                    await set_toggle_button_text('Pause');
                 }
                 await hide_error();
             } catch (error) {
@@ -197,7 +200,7 @@
         // Initialize WASM module
         initWasm().catch(async error => {
             await show_error(`Failed to initialize WASM: ${error.message}`);
-            toggleButton.disabled = true;
+            await set_toggle_button_disabled(true);
         });
     </script>
 </body>

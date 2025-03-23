@@ -1,5 +1,20 @@
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlVideoElement;
+use std::sync::Mutex;
+use once_cell::sync::Lazy;
+
+static VIDEO_STATE: Lazy<Mutex<VideoState>> = Lazy::new(|| {
+    Mutex::new(VideoState {
+        wasm_initialized: false,
+        is_muted: false,
+    })
+});
+
+#[derive(Default)]
+struct VideoState {
+    wasm_initialized: bool,
+    is_muted: bool,
+}
 
 #[wasm_bindgen]
 pub fn play_video() -> Result<(), JsValue> {
@@ -156,5 +171,66 @@ pub async fn update_time_display() -> Result<(), JsValue> {
     current_time_display.set_text_content(Some(&format_time(current_time)));
     total_time_display.set_text_content(Some(&format_time(duration)));
     
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn get_wasm_initialized() -> bool {
+    VIDEO_STATE.lock().unwrap().wasm_initialized
+}
+
+#[wasm_bindgen]
+pub fn set_wasm_initialized(value: bool) {
+    VIDEO_STATE.lock().unwrap().wasm_initialized = value;
+}
+
+#[wasm_bindgen]
+pub fn get_is_muted() -> bool {
+    VIDEO_STATE.lock().unwrap().is_muted
+}
+
+#[wasm_bindgen]
+pub fn set_is_muted(value: bool) {
+    VIDEO_STATE.lock().unwrap().is_muted = value;
+}
+
+#[wasm_bindgen]
+pub fn set_toggle_button_disabled(disabled: bool) -> Result<(), JsValue> {
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let button = document.get_element_by_id("toggleButton").unwrap();
+    
+    button.set_attribute("disabled", if disabled { "true" } else { "false" })?;
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn set_toggle_button_text(text: &str) -> Result<(), JsValue> {
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let button = document.get_element_by_id("toggleButton").unwrap();
+    
+    button.set_text_content(Some(text));
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn set_mute_button_text(is_muted: bool) -> Result<(), JsValue> {
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let button = document.get_element_by_id("muteButton").unwrap();
+    
+    button.set_text_content(Some(if is_muted { "Unmute" } else { "Mute" }));
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn set_fullscreen_button_text() -> Result<(), JsValue> {
+    let is_fullscreen = toggle_fullscreen()?;
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let button = document.get_element_by_id("fullscreenButton").unwrap();
+    
+    button.set_text_content(Some(if is_fullscreen { "Exit Fullscreen" } else { "Fullscreen" }));
     Ok(())
 } 
