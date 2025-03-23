@@ -24,7 +24,8 @@
     <button id="fetchPost">Fetch Post</button>
     <div id="postContent" class="post-content"></div>
     <script type="module">
-        import init, { greet, add, fetch_post } from './pkg/wasm_rust_play_video.js';
+        import init, { greet, add } from './pkg/wasm_rust_play_video.js';
+        import { fetch_post } from './pkg/wasm_rust_play_video.js';
 
         async function run() {
             await init();
