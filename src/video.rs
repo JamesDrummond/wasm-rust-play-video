@@ -140,4 +140,21 @@ pub fn is_fullscreen() -> Result<bool, JsValue> {
     let document = window.document().unwrap();
     
     Ok(document.fullscreen_element().is_some())
+}
+
+#[wasm_bindgen]
+pub async fn update_time_display() -> Result<(), JsValue> {
+    let current_time = get_video_time()?;
+    let duration = get_video_duration()?;
+    
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    
+    let current_time_display = document.get_element_by_id("currentTime").unwrap();
+    let total_time_display = document.get_element_by_id("totalTime").unwrap();
+    
+    current_time_display.set_text_content(Some(&format_time(current_time)));
+    total_time_display.set_text_content(Some(&format_time(duration)));
+    
+    Ok(())
 } 

@@ -107,7 +107,8 @@
             format_time,
             is_video_playing,
             is_video_muted,
-            is_fullscreen
+            is_fullscreen,
+            update_time_display
         } from './pkg/wasm_rust_play_video.js';
         
         let wasmInitialized = false;
@@ -123,10 +124,7 @@
         async function updateTimeDisplay() {
             if (!wasmInitialized) return;
             try {
-                const currentTime = await get_video_time();
-                const duration = await get_video_duration();
-                currentTimeDisplay.textContent = format_time(currentTime);
-                totalTimeDisplay.textContent = format_time(duration);
+                await update_time_display();
             } catch (error) {
                 await show_error(`Failed to update time display: ${error.message}`);
             }
