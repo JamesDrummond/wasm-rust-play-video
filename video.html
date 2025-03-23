@@ -132,87 +132,90 @@
             try {
                 await update_time_display();
             } catch (error) {
-                await show_error(`Failed to update time display: ${error.message}`);
+                await show_error(error.toString());
             }
         }
 
-        videoPlayer.addEventListener('timeupdate', updateTimeDisplay);
-        videoPlayer.addEventListener('loadedmetadata', updateTimeDisplay);
+        async function setupEventListeners() {
+            videoPlayer.addEventListener('timeupdate', updateTimeDisplay);
+            videoPlayer.addEventListener('loadedmetadata', updateTimeDisplay);
 
-        // Add event listeners for play/pause state
-        videoPlayer.addEventListener('play', async () => {
-            try {
-                await set_toggle_button_text('Pause');
-            } catch (error) {
-                await show_error(`Failed to update button text: ${error.message}`);
-            }
-        });
+            // Add event listeners for play/pause state
+            videoPlayer.addEventListener('play', async () => {
+                try {
+                    await set_toggle_button_text('Pause');
+                } catch (error) {
+                    await show_error(error.toString());
+                }
+            });
 
-        videoPlayer.addEventListener('pause', async () => {
-            try {
-                await set_toggle_button_text('Play');
-            } catch (error) {
-                await show_error(`Failed to update button text: ${error.message}`);
-            }
-        });
+            videoPlayer.addEventListener('pause', async () => {
+                try {
+                    await set_toggle_button_text('Play');
+                } catch (error) {
+                    await show_error(error.toString());
+                }
+            });
 
-        // Add event listener for mute state changes
-        videoPlayer.addEventListener('volumechange', async () => {
-            try {
-                await update_mute_button_text();
-            } catch (error) {
-                await show_error(`Failed to update mute button text: ${error.message}`);
-            }
-        });
+            // Add event listener for mute state changes
+            videoPlayer.addEventListener('volumechange', async () => {
+                try {
+                    await update_mute_button_text();
+                } catch (error) {
+                    await show_error(error.toString());
+                }
+            });
 
-        // Add event listener for fullscreen state changes
-        document.addEventListener('fullscreenchange', async () => {
-            try {
-                await update_fullscreen_button_text();
-            } catch (error) {
-                await show_error(`Failed to update fullscreen button text: ${error.message}`);
-            }
-        });
+            // Add event listener for fullscreen state changes
+            document.addEventListener('fullscreenchange', async () => {
+                try {
+                    await update_fullscreen_button_text();
+                } catch (error) {
+                    await show_error(error.toString());
+                }
+            });
 
-        fullscreenButton.addEventListener('click', async () => {
-            try {
-                await set_fullscreen_button_text();
-            } catch (error) {
-                await show_error(`Failed to toggle fullscreen: ${error.message}`);
-            }
-        });
-
-        muteButton.addEventListener('click', async () => {
-            try {
-                await toggle_mute();
-            } catch (error) {
-                await show_error(`Failed to toggle mute: ${error.message}`);
-            }
-        });
+        }
 
         async function initWasm() {
             try {
                 await init();
-                set_wasm_initialized(true);
+                await set_wasm_initialized(true);
+                await setupEventListeners();
             } catch (error) {
-                await show_error(`Failed to initialize WASM: ${error.message}`);
+                await show_error(error.toString());
                 await set_toggle_button_disabled(true);
             }
         }
 
+        // Define global functions for button clicks
         window.toggleVideo = async function() {
             try {
                 await play_video();
             } catch (error) {
-                await show_error(`Failed to ${isPlaying ? 'pause' : 'play'} video: ${error.message}`);
+                await show_error(error.toString());
+            }
+        };
+
+        window.toggleMute = async function() {
+            try {
+                console.log("toggle mute");
+                await toggle_mute();
+            } catch (error) {
+                await show_error(error.toString());
+            }
+        };
+
+        window.toggleFullscreen = async function() {
+            try {
+                await set_fullscreen_button_text();
+            } catch (error) {
+                await show_error(error.toString());
             }
         };
 
         // Initialize WASM module
-        initWasm().catch(async error => {
-            await show_error(`Failed to initialize WASM: ${error.message}`);
-            await set_toggle_button_disabled(true);
-        });
+        initWasm();
     </script>
 </body>
 </html> 

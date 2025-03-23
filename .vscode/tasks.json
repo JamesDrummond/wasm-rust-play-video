@@ -9,6 +9,7 @@
             "command": "wasm-pack",
             "args": [
                 "build",
+                "--debug",
                 "--target",
                 "web"
             ],
