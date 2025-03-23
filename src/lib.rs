@@ -3,6 +3,7 @@ use web_sys::HtmlVideoElement;
 
 mod mock_client;
 mod post_client;
+mod video;
 use mock_client::MockHttpClient;
 
 #[wasm_bindgen]
@@ -23,32 +24,6 @@ pub async fn greet(name: &str) -> Result<String, JsValue> {
 #[wasm_bindgen]
 pub fn add(a: i32, b: i32) -> i32 {
     a + b
-}
-
-#[wasm_bindgen]
-pub fn play_video() -> Result<(), JsValue> {
-    let window = web_sys::window().unwrap();
-    let document = window.document().unwrap();
-    let video_element = document
-        .get_element_by_id("videoPlayer")
-        .unwrap()
-        .dyn_into::<HtmlVideoElement>()?;
-    
-    video_element.play()?;
-    Ok(())
-}
-
-#[wasm_bindgen]
-pub fn pause_video() -> Result<(), JsValue> {
-    let window = web_sys::window().unwrap();
-    let document = window.document().unwrap();
-    let video_element = document
-        .get_element_by_id("videoPlayer")
-        .unwrap()
-        .dyn_into::<HtmlVideoElement>()?;
-    
-    video_element.pause()?;
-    Ok(())
 }
 
 #[cfg(test)]

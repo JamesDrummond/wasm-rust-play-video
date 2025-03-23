@@ -55,6 +55,18 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -65,27 +77,73 @@
             Your browser does not support the video tag.
         </video>
         <div class="controls">
-            <button onclick="playVideo()">Play</button>
-            <button onclick="pauseVideo()">Pause</button>
+            <button id="playButton" onclick="playVideo()">Play</button>
+            <button id="pauseButton" onclick="pauseVideo()">Pause</button>
         </div>
+        <div id="errorMessage" class="error-message"></div>
     </div>
 
     <script type="module">
         import init, { play_video, pause_video } from './pkg/wasm_rust_play_video.js';
         
-        async function initWasm() {
-            await init();
+        let wasmInitialized = false;
+        const errorMessage = document.getElementById('errorMessage');
+        const playButton = document.getElementById('playButton');
+        const pauseButton = document.getElementById('pauseButton');
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
         }
 
-        window.playVideo = function() {
-            play_video().catch(console.error);
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        async function initWasm() {
+            try {
+                await init();
+                wasmInitialized = true;
+                hideError();
+            } catch (error) {
+                showError(`Failed to initialize WASM: ${error.message}`);
+                playButton.disabled = true;
+                pauseButton.disabled = true;
+            }
+        }
+
+        window.playVideo = async function() {
+            if (!wasmInitialized) {
+                showError('WASM module not initialized');
+                return;
+            }
+            try {
+                await play_video();
+                hideError();
+            } catch (error) {
+                showError(`Failed to play video: ${error.message}`);
+            }
         };
 
-        window.pauseVideo = function() {
-            pause_video().catch(console.error);
+        window.pauseVideo = async function() {
+            if (!wasmInitialized) {
+                showError('WASM module not initialized');
+                return;
+            }
+            try {
+                await pause_video();
+                hideError();
+            } catch (error) {
+                showError(`Failed to pause video: ${error.message}`);
+            }
         };
 
-        initWasm().catch(console.error);
+        // Initialize WASM module
+        initWasm().catch(error => {
+            showError(`Failed to initialize WASM: ${error.message}`);
+            playButton.disabled = true;
+            pauseButton.disabled = true;
+        });
     </script>
 </body>
 </html> 
