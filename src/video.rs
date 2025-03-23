@@ -80,4 +80,25 @@ pub fn get_video_duration() -> Result<f64, JsValue> {
         .dyn_into::<HtmlVideoElement>()?;
     
     Ok(video_element.duration())
+}
+
+#[wasm_bindgen]
+pub fn show_error(message: &str) -> Result<(), JsValue> {
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let error_element = document.get_element_by_id("errorMessage").unwrap();
+    
+    error_element.set_text_content(Some(message));
+    error_element.set_attribute("style", "display: block")?;
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn hide_error() -> Result<(), JsValue> {
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let error_element = document.get_element_by_id("errorMessage").unwrap();
+    
+    error_element.set_attribute("style", "display: none")?;
+    Ok(())
 } 

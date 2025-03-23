@@ -101,7 +101,9 @@
             toggle_mute, 
             toggle_fullscreen,
             get_video_time,
-            get_video_duration 
+            get_video_duration,
+            show_error,
+            hide_error
         } from './pkg/wasm_rust_play_video.js';
         
         let wasmInitialized = false;
@@ -129,7 +131,7 @@
                 currentTimeDisplay.textContent = formatTime(currentTime);
                 totalTimeDisplay.textContent = formatTime(duration);
             } catch (error) {
-                showError(`Failed to update time display: ${error.message}`);
+                await show_error(`Failed to update time display: ${error.message}`);
             }
         }
 
@@ -138,55 +140,46 @@
 
         window.toggleMute = async function() {
             if (!wasmInitialized) {
-                showError('WASM module not initialized');
+                await show_error('WASM module not initialized');
                 return;
             }
             try {
                 isMuted = await toggle_mute();
                 muteButton.textContent = isMuted ? 'Unmute' : 'Mute';
-                hideError();
+                await hide_error();
             } catch (error) {
-                showError(`Failed to toggle mute: ${error.message}`);
+                await show_error(`Failed to toggle mute: ${error.message}`);
             }
         };
 
         window.toggleFullscreen = async function() {
             if (!wasmInitialized) {
-                showError('WASM module not initialized');
+                await show_error('WASM module not initialized');
                 return;
             }
             try {
                 const isFullscreen = await toggle_fullscreen();
                 fullscreenButton.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
-                hideError();
+                await hide_error();
             } catch (error) {
-                showError(`Failed to toggle fullscreen: ${error.message}`);
+                await show_error(`Failed to toggle fullscreen: ${error.message}`);
             }
         };
-
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-        }
-
-        function hideError() {
-            errorMessage.style.display = 'none';
-        }
 
         async function initWasm() {
             try {
                 await init();
                 wasmInitialized = true;
-                hideError();
+                await hide_error();
             } catch (error) {
-                showError(`Failed to initialize WASM: ${error.message}`);
+                await show_error(`Failed to initialize WASM: ${error.message}`);
                 toggleButton.disabled = true;
             }
         }
 
         window.toggleVideo = async function() {
             if (!wasmInitialized) {
-                showError('WASM module not initialized');
+                await show_error('WASM module not initialized');
                 return;
             }
             try {
@@ -199,15 +192,15 @@
                     toggleButton.textContent = 'Pause';
                     isPlaying = true;
                 }
-                hideError();
+                await hide_error();
             } catch (error) {
-                showError(`Failed to ${isPlaying ? 'pause' : 'play'} video: ${error.message}`);
+                await show_error(`Failed to ${isPlaying ? 'pause' : 'play'} video: ${error.message}`);
             }
         };
 
         // Initialize WASM module
-        initWasm().catch(error => {
-            showError(`Failed to initialize WASM: ${error.message}`);
+        initWasm().catch(async error => {
+            await show_error(`Failed to initialize WASM: ${error.message}`);
             toggleButton.disabled = true;
         });
     </script>
