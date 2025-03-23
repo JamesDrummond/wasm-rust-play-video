@@ -114,7 +114,9 @@
             set_toggle_button_disabled,
             set_toggle_button_text,
             set_mute_button_text,
-            set_fullscreen_button_text
+            set_fullscreen_button_text,
+            update_mute_button_text,
+            update_fullscreen_button_text
         } from './pkg/wasm_rust_play_video.js';
         
         const errorMessage = document.getElementById('errorMessage');
@@ -157,8 +159,7 @@
         // Add event listener for mute state changes
         videoPlayer.addEventListener('volumechange', async () => {
             try {
-                const isMuted = await is_video_muted();
-                await set_mute_button_text(isMuted);
+                await update_mute_button_text();
             } catch (error) {
                 await show_error(`Failed to update mute button text: ${error.message}`);
             }
@@ -167,9 +168,7 @@
         // Add event listener for fullscreen state changes
         document.addEventListener('fullscreenchange', async () => {
             try {
-                const isFullscreen = await is_fullscreen();
-                const button = document.getElementById('fullscreenButton');
-                button.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+                await update_fullscreen_button_text();
             } catch (error) {
                 await show_error(`Failed to update fullscreen button text: ${error.message}`);
             }

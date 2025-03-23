@@ -240,4 +240,33 @@ pub fn set_fullscreen_button_text() -> Result<(), JsValue> {
     button.set_text_content(Some(if is_fullscreen { "Exit Fullscreen" } else { "Fullscreen" }));
     hide_error()?;
     Ok(())
+}
+
+#[wasm_bindgen]
+pub fn update_mute_button_text() -> Result<(), JsValue> {
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let video_element = document
+        .get_element_by_id("videoPlayer")
+        .unwrap()
+        .dyn_into::<HtmlVideoElement>()?;
+    
+    let is_muted = video_element.muted();
+    let button = document.get_element_by_id("muteButton").unwrap();
+    button.set_text_content(Some(if is_muted { "Unmute" } else { "Mute" }));
+    
+    hide_error()?;
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn update_fullscreen_button_text() -> Result<(), JsValue> {
+    let is_fullscreen = is_fullscreen()?;
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let button = document.get_element_by_id("fullscreenButton").unwrap();
+    
+    button.set_text_content(Some(if is_fullscreen { "Exit Fullscreen" } else { "Fullscreen" }));
+    hide_error()?;
+    Ok(())
 } 
