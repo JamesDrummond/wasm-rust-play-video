@@ -2,18 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Build WASM",
+            "name": "Build and Launch WASM Server",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "wasm-pack",
+            "runtimeExecutable": "basic-http-server",
             "runtimeArgs": [
-                "build",
-                "--target",
-                "web"
+                "."
             ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
+            "internalConsoleOptions": "neverOpen",
+            "serverReadyAction": {
+                "pattern": "addr: (https?://\\S+)",
+                "uriFormat": "%s",
+                "action": "openExternally"
+            },
+            "preLaunchTask": "build"
         },
         {
             "name": "Launch WASM Server",
@@ -30,17 +34,6 @@
                 "pattern": "addr: (https?://\\S+)",
                 "uriFormat": "%s",
                 "action": "openExternally"
-            }
-        }
-    ],
-    "compounds": [
-        {
-            "name": "Build and Run WASM",
-            "configurations": ["Build WASM", "Launch WASM Server"],
-            "presentation": {
-                "hidden": false,
-                "group": "WASM",
-                "order": 1
             }
         }
     ]
