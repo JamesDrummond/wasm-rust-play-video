@@ -1,0 +1,57 @@
+{
+    "projectType": "rust-wasm",
+    "linting": {
+        "rust": {
+            "clippy": {
+                "level": "warn",
+                "extraArgs": [
+                    "--target=wasm32-unknown-unknown"
+                ]
+            }
+        }
+    },
+    "suggestions": {
+        "rust": {
+            "wasmIncompatible": {
+                "enabled": true,
+                "patterns": [
+                    "std::fs",
+                    "std::net",
+                    "std::process",
+                    "std::thread",
+                    "std::time::SystemTime",
+                    "std::sync::Mutex",
+                    "std::sync::RwLock",
+                    "std::sync::Condvar",
+                    "std::sync::Barrier",
+                    "std::sync::Once",
+                    "std::sync::mpsc",
+                    "std::sync::atomic",
+                    "std::os::unix",
+                    "std::os::windows",
+                    "std::os::raw",
+                    "std::io::File",
+                    "std::io::Stdout",
+                    "std::io::Stdin",
+                    "std::io::Stderr"
+                ]
+            }
+        }
+    },
+    "formatting": {
+        "rust": {
+            "rustfmt": {
+                "edition": "2021",
+                "extraArgs": [
+                    "--target=wasm32-unknown-unknown"
+                ]
+            }
+        }
+    },
+    "completion": {
+        "rust": {
+            "wasmTarget": "wasm32-unknown-unknown",
+            "suggestWasmCompatibleCrates": true
+        }
+    }
+} 
