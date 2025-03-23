@@ -97,13 +97,11 @@
     <script type="module">
         import init, { 
             play_video, 
-            pause_video, 
             toggle_mute, 
             toggle_fullscreen,
             get_video_time,
             get_video_duration,
             show_error,
-            hide_error,
             format_time,
             is_video_playing,
             is_video_muted,
@@ -140,27 +138,16 @@
         videoPlayer.addEventListener('loadedmetadata', updateTimeDisplay);
 
         fullscreenButton.addEventListener('click', async () => {
-            if (!get_wasm_initialized()) {
-                await show_error('WASM module not initialized');
-                return;
-            }
             try {
                 await set_fullscreen_button_text();
-                await hide_error();
             } catch (error) {
                 await show_error(`Failed to toggle fullscreen: ${error.message}`);
             }
         });
 
         muteButton.addEventListener('click', async () => {
-            if (!get_wasm_initialized()) {
-                await show_error('WASM module not initialized');
-                return;
-            }
             try {
-                const isMuted = await toggle_mute();
-                await set_mute_button_text(isMuted);
-                await hide_error();
+                await toggle_mute();
             } catch (error) {
                 await show_error(`Failed to toggle mute: ${error.message}`);
             }
@@ -170,7 +157,6 @@
             try {
                 await init();
                 set_wasm_initialized(true);
-                await hide_error();
             } catch (error) {
                 await show_error(`Failed to initialize WASM: ${error.message}`);
                 await set_toggle_button_disabled(true);
@@ -178,20 +164,8 @@
         }
 
         window.toggleVideo = async function() {
-            if (!get_wasm_initialized()) {
-                await show_error('WASM module not initialized');
-                return;
-            }
             try {
-                const isPlaying = await is_video_playing();
-                if (isPlaying) {
-                    await pause_video();
-                    await set_toggle_button_text('Play');
-                } else {
-                    await play_video();
-                    await set_toggle_button_text('Pause');
-                }
-                await hide_error();
+                await play_video();
             } catch (error) {
                 await show_error(`Failed to ${isPlaying ? 'pause' : 'play'} video: ${error.message}`);
             }

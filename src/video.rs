@@ -24,21 +24,15 @@ pub fn play_video() -> Result<(), JsValue> {
         .get_element_by_id("videoPlayer")
         .unwrap()
         .dyn_into::<HtmlVideoElement>()?;
-    
-    video_element.play()?;
-    Ok(())
-}
-
-#[wasm_bindgen]
-pub fn pause_video() -> Result<(), JsValue> {
-    let window = web_sys::window().unwrap();
-    let document = window.document().unwrap();
-    let video_element = document
-        .get_element_by_id("videoPlayer")
-        .unwrap()
-        .dyn_into::<HtmlVideoElement>()?;
-    
-    video_element.pause()?;
+    let is_video_playing = is_video_playing()?;
+    if is_video_playing {
+        let _ = video_element.pause()?;
+        let _result = set_toggle_button_text("Play");
+    } else {
+        let _ = video_element.play()?;
+        let _result = set_toggle_button_text("Pause");
+    }
+    hide_error()?;
     Ok(())
 }
 
@@ -51,7 +45,15 @@ pub fn toggle_mute() -> Result<bool, JsValue> {
         .unwrap()
         .dyn_into::<HtmlVideoElement>()?;
     
-    video_element.set_muted(!video_element.muted());
+    let muted = video_element.muted();
+    video_element.set_muted(!muted);
+    if muted {
+        let _result = set_mute_button_text(false);
+    } else {
+        let _result = set_mute_button_text(true);
+    }
+    
+    hide_error()?;
     Ok(video_element.muted())
 }
 
@@ -66,9 +68,11 @@ pub fn toggle_fullscreen() -> Result<bool, JsValue> {
     
     if document.fullscreen_element().is_some() {
         document.exit_fullscreen();
+        hide_error()?;
         Ok(false)
     } else {
         video_element.request_fullscreen()?;
+        hide_error()?;
         Ok(true)
     }
 }
@@ -182,6 +186,7 @@ pub fn get_wasm_initialized() -> bool {
 #[wasm_bindgen]
 pub fn set_wasm_initialized(value: bool) {
     VIDEO_STATE.lock().unwrap().wasm_initialized = value;
+    hide_error().unwrap();
 }
 
 #[wasm_bindgen]
@@ -221,6 +226,7 @@ pub fn set_mute_button_text(is_muted: bool) -> Result<(), JsValue> {
     let button = document.get_element_by_id("muteButton").unwrap();
     
     button.set_text_content(Some(if is_muted { "Unmute" } else { "Mute" }));
+    hide_error()?;
     Ok(())
 }
 
@@ -232,5 +238,6 @@ pub fn set_fullscreen_button_text() -> Result<(), JsValue> {
     let button = document.get_element_by_id("fullscreenButton").unwrap();
     
     button.set_text_content(Some(if is_fullscreen { "Exit Fullscreen" } else { "Fullscreen" }));
+    hide_error()?;
     Ok(())
 } 
