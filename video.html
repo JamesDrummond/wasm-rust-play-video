@@ -40,6 +40,13 @@
             display: flex;
             gap: 10px;
             justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .time-display {
+            font-family: monospace;
+            margin: 0 10px;
         }
 
         button {
@@ -78,17 +85,84 @@
         </video>
         <div class="controls">
             <button id="toggleButton" onclick="toggleVideo()">Play</button>
+            <button id="muteButton" onclick="toggleMute()">Mute</button>
+            <button id="fullscreenButton" onclick="toggleFullscreen()">Fullscreen</button>
+            <span class="time-display">
+                <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+            </span>
         </div>
         <div id="errorMessage" class="error-message"></div>
     </div>
 
     <script type="module">
-        import init, { play_video, pause_video } from './pkg/wasm_rust_play_video.js';
+        import init, { 
+            play_video, 
+            pause_video, 
+            toggle_mute, 
+            toggle_fullscreen,
+            get_video_time,
+            get_video_duration 
+        } from './pkg/wasm_rust_play_video.js';
         
         let wasmInitialized = false;
         let isPlaying = false;
+        let isMuted = false;
         const errorMessage = document.getElementById('errorMessage');
         const toggleButton = document.getElementById('toggleButton');
+        const muteButton = document.getElementById('muteButton');
+        const fullscreenButton = document.getElementById('fullscreenButton');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const totalTimeDisplay = document.getElementById('totalTime');
+        const videoPlayer = document.getElementById('videoPlayer');
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        async function updateTimeDisplay() {
+            if (!wasmInitialized) return;
+            try {
+                const currentTime = await get_video_time();
+                const duration = await get_video_duration();
+                currentTimeDisplay.textContent = formatTime(currentTime);
+                totalTimeDisplay.textContent = formatTime(duration);
+            } catch (error) {
+                showError(`Failed to update time display: ${error.message}`);
+            }
+        }
+
+        videoPlayer.addEventListener('timeupdate', updateTimeDisplay);
+        videoPlayer.addEventListener('loadedmetadata', updateTimeDisplay);
+
+        window.toggleMute = async function() {
+            if (!wasmInitialized) {
+                showError('WASM module not initialized');
+                return;
+            }
+            try {
+                isMuted = await toggle_mute();
+                muteButton.textContent = isMuted ? 'Unmute' : 'Mute';
+                hideError();
+            } catch (error) {
+                showError(`Failed to toggle mute: ${error.message}`);
+            }
+        };
+
+        window.toggleFullscreen = async function() {
+            if (!wasmInitialized) {
+                showError('WASM module not initialized');
+                return;
+            }
+            try {
+                const isFullscreen = await toggle_fullscreen();
+                fullscreenButton.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+                hideError();
+            } catch (error) {
+                showError(`Failed to toggle fullscreen: ${error.message}`);
+            }
+        };
 
         function showError(message) {
             errorMessage.textContent = message;
