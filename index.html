@@ -14,7 +14,7 @@
             await init();
             
             // Test the greet function
-            const greeting = greet("WebAssembly");
+            const greeting = await greet("WebAssembly");
             document.getElementById('result').innerHTML = `
                 <p>${greeting}</p>
                 <p>2 + 3 = ${add(2, 3)}</p>
