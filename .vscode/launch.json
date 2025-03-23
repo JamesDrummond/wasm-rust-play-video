@@ -14,7 +14,7 @@
             "internalConsoleOptions": "neverOpen",
             "serverReadyAction": {
                 "pattern": "addr: (https?://\\S+)",
-                "uriFormat": "%s",
+                "uriFormat": "%s/video.html",
                 "action": "openExternally"
             },
             "preLaunchTask": "build"
@@ -32,7 +32,7 @@
             "internalConsoleOptions": "neverOpen",
             "serverReadyAction": {
                 "pattern": "addr: (https?://\\S+)",
-                "uriFormat": "%s",
+                "uriFormat": "%s/video.html",
                 "action": "openExternally"
             }
         }
