@@ -103,11 +103,14 @@
             get_video_time,
             get_video_duration,
             show_error,
-            hide_error
+            hide_error,
+            format_time,
+            is_video_playing,
+            is_video_muted,
+            is_fullscreen
         } from './pkg/wasm_rust_play_video.js';
         
         let wasmInitialized = false;
-        let isPlaying = false;
         let isMuted = false;
         const errorMessage = document.getElementById('errorMessage');
         const toggleButton = document.getElementById('toggleButton');
@@ -117,19 +120,13 @@
         const totalTimeDisplay = document.getElementById('totalTime');
         const videoPlayer = document.getElementById('videoPlayer');
 
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.floor(seconds % 60);
-            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
-
         async function updateTimeDisplay() {
             if (!wasmInitialized) return;
             try {
                 const currentTime = await get_video_time();
                 const duration = await get_video_duration();
-                currentTimeDisplay.textContent = formatTime(currentTime);
-                totalTimeDisplay.textContent = formatTime(duration);
+                currentTimeDisplay.textContent = format_time(currentTime);
+                totalTimeDisplay.textContent = format_time(duration);
             } catch (error) {
                 await show_error(`Failed to update time display: ${error.message}`);
             }
@@ -144,7 +141,8 @@
                 return;
             }
             try {
-                isMuted = await toggle_mute();
+                await toggle_mute();
+                const isMuted = await is_video_muted();
                 muteButton.textContent = isMuted ? 'Unmute' : 'Mute';
                 await hide_error();
             } catch (error) {
@@ -158,8 +156,9 @@
                 return;
             }
             try {
-                const isFullscreen = await toggle_fullscreen();
-                fullscreenButton.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+                await toggle_fullscreen();
+                const isFullscreenMode = await is_fullscreen();
+                fullscreenButton.textContent = isFullscreenMode ? 'Exit Fullscreen' : 'Fullscreen';
                 await hide_error();
             } catch (error) {
                 await show_error(`Failed to toggle fullscreen: ${error.message}`);
@@ -183,14 +182,13 @@
                 return;
             }
             try {
+                const isPlaying = await is_video_playing();
                 if (isPlaying) {
                     await pause_video();
                     toggleButton.textContent = 'Play';
-                    isPlaying = false;
                 } else {
                     await play_video();
                     toggleButton.textContent = 'Pause';
-                    isPlaying = true;
                 }
                 await hide_error();
             } catch (error) {

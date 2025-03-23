@@ -101,4 +101,43 @@ pub fn hide_error() -> Result<(), JsValue> {
     
     error_element.set_attribute("style", "display: none")?;
     Ok(())
+}
+
+#[wasm_bindgen]
+pub fn format_time(seconds: f64) -> String {
+    let minutes = (seconds / 60.0).floor() as i32;
+    let remaining_seconds = (seconds % 60.0).floor() as i32;
+    format!("{}:{:02}", minutes, remaining_seconds)
+}
+
+#[wasm_bindgen]
+pub fn is_video_playing() -> Result<bool, JsValue> {
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let video_element = document
+        .get_element_by_id("videoPlayer")
+        .unwrap()
+        .dyn_into::<HtmlVideoElement>()?;
+    
+    Ok(!video_element.paused())
+}
+
+#[wasm_bindgen]
+pub fn is_video_muted() -> Result<bool, JsValue> {
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let video_element = document
+        .get_element_by_id("videoPlayer")
+        .unwrap()
+        .dyn_into::<HtmlVideoElement>()?;
+    
+    Ok(video_element.muted())
+}
+
+#[wasm_bindgen]
+pub fn is_fullscreen() -> Result<bool, JsValue> {
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    
+    Ok(document.fullscreen_element().is_some())
 } 
