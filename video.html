@@ -137,6 +137,44 @@
         videoPlayer.addEventListener('timeupdate', updateTimeDisplay);
         videoPlayer.addEventListener('loadedmetadata', updateTimeDisplay);
 
+        // Add event listeners for play/pause state
+        videoPlayer.addEventListener('play', async () => {
+            try {
+                await set_toggle_button_text('Pause');
+            } catch (error) {
+                await show_error(`Failed to update button text: ${error.message}`);
+            }
+        });
+
+        videoPlayer.addEventListener('pause', async () => {
+            try {
+                await set_toggle_button_text('Play');
+            } catch (error) {
+                await show_error(`Failed to update button text: ${error.message}`);
+            }
+        });
+
+        // Add event listener for mute state changes
+        videoPlayer.addEventListener('volumechange', async () => {
+            try {
+                const isMuted = await is_video_muted();
+                await set_mute_button_text(isMuted);
+            } catch (error) {
+                await show_error(`Failed to update mute button text: ${error.message}`);
+            }
+        });
+
+        // Add event listener for fullscreen state changes
+        document.addEventListener('fullscreenchange', async () => {
+            try {
+                const isFullscreen = await is_fullscreen();
+                const button = document.getElementById('fullscreenButton');
+                button.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+            } catch (error) {
+                await show_error(`Failed to update fullscreen button text: ${error.message}`);
+            }
+        });
+
         fullscreenButton.addEventListener('click', async () => {
             try {
                 await set_fullscreen_button_text();
