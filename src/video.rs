@@ -319,4 +319,79 @@ pub fn update_seek_bar() -> Result<(), JsValue> {
     }
     hide_error()?;
     Ok(())
+}
+
+#[wasm_bindgen]
+pub async fn download_video() -> Result<(), JsValue> {
+    Logger::info("Entering download_video()").map_err(|e| VideoError::VideoOperationFailed(e.to_string()))?;
+    let video_element = get_video_element()?;
+    let source = video_element.query_selector("source")
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get source element: {:?}", e)))?
+        .ok_or_else(|| VideoError::VideoOperationFailed("No source element found".to_string()))?;
+    
+    let video_url = source.get_attribute("src")
+        .ok_or_else(|| VideoError::VideoOperationFailed("No source URL found".to_string()))?;
+
+    let window = web_sys::window().ok_or(VideoError::WindowNotFound)?;
+    let document = window.document().ok_or(VideoError::DocumentNotFound)?;
+    
+    // Create fetch request
+    let init = web_sys::RequestInit::new();
+    init.set_method("GET");
+    init.set_mode(web_sys::RequestMode::Cors);
+    
+    let request = web_sys::Request::new_with_str_and_init(&video_url, &init)
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to create request: {:?}", e)))?;
+    
+    // Fetch the video
+    let response = wasm_bindgen_futures::JsFuture::from(window.fetch_with_request(&request))
+        .await
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to fetch video: {:?}", e)))?;
+    
+    let response: web_sys::Response = response.dyn_into()
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to convert response: {:?}", e)))?;
+    
+    // Get the blob
+    let blob = wasm_bindgen_futures::JsFuture::from(response.blob().unwrap())
+        .await
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get blob: {:?}", e)))?;
+    
+    let blob: web_sys::Blob = blob.dyn_into()
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to convert blob: {:?}", e)))?;
+    
+    // Create object URL
+    let url = web_sys::Url::create_object_url_with_blob(&blob)
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to create object URL: {:?}", e)))?;
+    
+    // Create anchor element
+    let anchor = document.create_element("a")
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to create anchor element: {:?}", e)))?;
+    
+    // Set download attributes
+    anchor.set_attribute("href", &url)
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to set href: {:?}", e)))?;
+    anchor.set_attribute("download", "video.mp4")
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to set download attribute: {:?}", e)))?;
+    
+    // Append to document and click
+    document.body()
+        .ok_or_else(|| VideoError::VideoOperationFailed("No body element found".to_string()))?
+        .append_child(&anchor)
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to append anchor: {:?}", e)))?;
+    
+    // Click the anchor element
+    let html_anchor = anchor.unchecked_into::<web_sys::HtmlElement>();
+    html_anchor.click();
+    
+    // Clean up
+    web_sys::Url::revoke_object_url(&url)
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to revoke object URL: {:?}", e)))?;
+    
+    document.body()
+        .ok_or_else(|| VideoError::VideoOperationFailed("No body element found".to_string()))?
+        .remove_child(&html_anchor)
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to remove anchor: {:?}", e)))?;
+    
+    hide_error()?;
+    Ok(())
 } 
