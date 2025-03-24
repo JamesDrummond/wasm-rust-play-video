@@ -126,19 +126,30 @@
         const currentTimeDisplay = document.getElementById('currentTime');
         const totalTimeDisplay = document.getElementById('totalTime');
         const videoPlayer = document.getElementById('videoPlayer');
+        let wasmInitialized = false;
 
         async function updateTimeDisplay() {
-            if (!get_wasm_initialized()) return;
+            if(!wasmInitialized) {
+                wasmInitialized = await get_wasm_initialized();
+                if(!wasmInitialized)
+                    return;
+            }
             try {
-                await update_time_display();
+                update_time_display();
             } catch (error) {
                 await show_error(error.toString());
             }
         }
 
         async function setupEventListeners() {
+            // Update time display when video time changes
             videoPlayer.addEventListener('timeupdate', updateTimeDisplay);
+            
+            // Update duration when video metadata is loaded
             videoPlayer.addEventListener('loadedmetadata', updateTimeDisplay);
+            
+            // Update duration if it changes (some video formats might report duration later)
+            videoPlayer.addEventListener('durationchange', updateTimeDisplay);
 
             // Add event listeners for play/pause state
             videoPlayer.addEventListener('play', async () => {
@@ -181,6 +192,7 @@
             try {
                 await init();
                 await set_wasm_initialized(true);
+                wasmInitialized = await get_wasm_initialized();
                 await setupEventListeners();
             } catch (error) {
                 await show_error(error.toString());

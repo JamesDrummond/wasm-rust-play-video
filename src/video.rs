@@ -187,14 +187,17 @@ pub fn is_fullscreen() -> Result<bool, JsValue> {
 #[wasm_bindgen]
 pub async fn update_time_display() -> Result<(), JsValue> {
     Logger::info("Entering update_time_display()").map_err(|e| VideoError::VideoOperationFailed(e.to_string()))?;
-    let current_time = get_video_time()?;
-    let duration = get_video_duration()?;
+    let video_element = get_video_element()?;
+    let current_time = video_element.current_time();
+    let duration = video_element.duration();
     
     let current_time_display = get_element_by_id("currentTime")?;
     let total_time_display = get_element_by_id("totalTime")?;
     
     current_time_display.set_text_content(Some(&format_time(current_time)));
-    total_time_display.set_text_content(Some(&format_time(duration)));
+    if !duration.is_nan() {
+        total_time_display.set_text_content(Some(&format_time(duration)));
+    }
     
     Ok(())
 }
@@ -208,7 +211,10 @@ pub fn get_wasm_initialized() -> bool {
 #[wasm_bindgen]
 pub fn set_wasm_initialized(value: bool) -> Result<(), JsValue> {
     Logger::info("Entering set_wasm_initialized()").map_err(|e| VideoError::VideoOperationFailed(e.to_string()))?;
-    VIDEO_STATE.lock().map_err(|e| VideoError::StateError(format!("Failed to lock state: {:?}", e)))?;
+    let mut result = VIDEO_STATE.lock().map_err(|e| VideoError::StateError(format!("Failed to lock state: {:?}", e)))?;
+    if result.wasm_initialized != value {
+        result.wasm_initialized = value;
+    }
     hide_error()?;
     Ok(())
 }
@@ -222,7 +228,11 @@ pub fn get_is_muted() -> bool {
 #[wasm_bindgen]
 pub fn set_is_muted(value: bool) -> Result<(), JsValue> {
     Logger::info("Entering set_is_muted()").map_err(|e| VideoError::VideoOperationFailed(e.to_string()))?;
-    VIDEO_STATE.lock().map_err(|e| VideoError::StateError(format!("Failed to lock state: {:?}", e)))?;
+    let mut result = VIDEO_STATE.lock().map_err(|e| VideoError::StateError(format!("Failed to lock state: {:?}", e)))?;
+    if result.is_muted != value {
+        result.is_muted = value;
+    }
+    hide_error()?;
     Ok(())
 }
 

@@ -1,9 +1,9 @@
 use wasm_bindgen::prelude::*;
-use web_sys::HtmlVideoElement;
 
 mod mock_client;
 mod post_client;
 mod video;
+mod logger;
 use mock_client::MockHttpClient;
 
 #[wasm_bindgen]
