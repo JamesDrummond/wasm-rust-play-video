@@ -502,6 +502,7 @@ pub async fn download_video() -> Result<(), JsValue> {
         show_error(&error.to_string()).unwrap_or_default();
         error
     })?;
+    hide_menus()?;
     let video_element = get_video_element()?;
     let source = video_element.query_selector("source")
         .map_err(|e| {
@@ -645,7 +646,6 @@ pub async fn download_video() -> Result<(), JsValue> {
             show_error(&error.to_string()).unwrap_or_default();
             error
         })?;
-    
     hide_error()?;
     Ok(())
 }

@@ -113,58 +113,23 @@
             // Update duration if it changes (some video formats might report duration later)
             videoPlayer.addEventListener('durationchange', updateTimeDisplay);
 
-            // Add seek bar event listeners
-            seekBar.addEventListener('input', async () => {
-                try {
-                    await seek_video(parseFloat(seekBar.value));
-                } catch (error) {
-                    // Error is now handled in Rust
-                }
-            });
 
             // Update seek bar as video plays
-            videoPlayer.addEventListener('timeupdate', async () => {
-                try {
-                    await update_seek_bar();
-                } catch (error) {
-                    // Error is now handled in Rust
-                }
-            });
+            videoPlayer.addEventListener('timeupdate', async () => await update_seek_bar());
 
             // Add event listeners for play/pause state
-            videoPlayer.addEventListener('play', async () => {
-                try {
-                    await set_toggle_button_text('Pause');
-                } catch (error) {
-                    // Error is now handled in Rust
-                }
-            });
+            videoPlayer.addEventListener('play', async () => await set_toggle_button_text('Pause'));
 
-            videoPlayer.addEventListener('pause', async () => {
-                try {
-                    await set_toggle_button_text('Play');
-                } catch (error) {
-                    // Error is now handled in Rust
-                }
-            });
+            videoPlayer.addEventListener('pause', async () => await set_toggle_button_text('Play'));
 
             // Add event listener for mute state changes
-            videoPlayer.addEventListener('volumechange', async () => {
-                try {
-                    await update_mute_button_text();
-                } catch (error) {
-                    // Error is now handled in Rust
-                }
-            });
+            videoPlayer.addEventListener('volumechange', async () => await update_mute_button_text());
+
+            // Add seek bar event listeners
+            seekBar.addEventListener('input', async () => await seek_video(parseFloat(seekBar.value)));
 
             // Add event listener for fullscreen state changes
-            document.addEventListener('fullscreenchange', async () => {
-                try {
-                    await update_fullscreen_button_text();
-                } catch (error) {
-                    // Error is now handled in Rust
-                }
-            });
+            document.addEventListener('fullscreenchange', async () => await update_fullscreen_button_text());
         }
 
         async function initWasm() {
@@ -180,30 +145,10 @@
         }
 
         // Define global functions for button clicks
-        window.toggleVideo = async function() {
-            try {
-                await play_video();
-            } catch (error) {
-                // Error is now handled in Rust
-            }
-        };
+        window.toggleVideo = async() => await play_video();
+        window.toggleMute = async() => await toggle_mute();
 
-        window.toggleMute = async function() {
-            try {
-                console.log("toggle mute");
-                await toggle_mute();
-            } catch (error) {
-                // Error is now handled in Rust
-            }
-        };
-
-        window.toggleFullscreen = async function() {
-            try {
-                await set_fullscreen_button_text();
-            } catch (error) {
-                // Error is now handled in Rust
-            }
-        };
+        window.toggleFullscreen = async() => await toggle_fullscreen();
 
         // Context menu functionality
         const contextMenu = document.getElementById('contextMenu');
@@ -226,32 +171,15 @@
             playbackSpeedMenu.classList.toggle('show');
         };
 
-        window.setPlaybackSpeed = async function(speed) {
-            try {
-                await set_playback_speed(speed);
-            } catch (error) {
-                // Error is now handled in Rust
-            }
-        };
+        window.setPlaybackSpeed = async(speed) => await set_playback_speed(speed);
 
-        window.downloadVideo = async function() {
-            try {
-                await download_video();
-            } catch (error) {
-                // Error is now handled in Rust
-            }
-            contextMenu.classList.remove('show');
-        };
+        window.downloadVideo = async() => await download_video();
 
         window.togglePictureInPicture = async function() {
-            try {
-                if (document.pictureInPictureElement) {
-                    await document.exitPictureInPicture();
-                } else if (document.pictureInPictureEnabled) {
-                    await videoPlayer.requestPictureInPicture();
-                }
-            } catch (error) {
-                // Error is now handled in Rust
+            if (document.pictureInPictureElement) {
+                await document.exitPictureInPicture();
+            } else if (document.pictureInPictureEnabled) {
+                await videoPlayer.requestPictureInPicture();
             }
         };
 
