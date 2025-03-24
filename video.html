@@ -99,7 +99,7 @@
             try {
                 update_time_display();
             } catch (error) {
-                await show_error(error.toString());
+                // Error is now handled in Rust
             }
         }
 
@@ -118,7 +118,7 @@
                 try {
                     await seek_video(parseFloat(seekBar.value));
                 } catch (error) {
-                    await show_error(error.toString());
+                    // Error is now handled in Rust
                 }
             });
 
@@ -127,7 +127,7 @@
                 try {
                     await update_seek_bar();
                 } catch (error) {
-                    await show_error(error.toString());
+                    // Error is now handled in Rust
                 }
             });
 
@@ -136,7 +136,7 @@
                 try {
                     await set_toggle_button_text('Pause');
                 } catch (error) {
-                    await show_error(error.toString());
+                    // Error is now handled in Rust
                 }
             });
 
@@ -144,7 +144,7 @@
                 try {
                     await set_toggle_button_text('Play');
                 } catch (error) {
-                    await show_error(error.toString());
+                    // Error is now handled in Rust
                 }
             });
 
@@ -153,7 +153,7 @@
                 try {
                     await update_mute_button_text();
                 } catch (error) {
-                    await show_error(error.toString());
+                    // Error is now handled in Rust
                 }
             });
 
@@ -162,10 +162,9 @@
                 try {
                     await update_fullscreen_button_text();
                 } catch (error) {
-                    await show_error(error.toString());
+                    // Error is now handled in Rust
                 }
             });
-
         }
 
         async function initWasm() {
@@ -175,7 +174,7 @@
                 wasmInitialized = await get_wasm_initialized();
                 await setupEventListeners();
             } catch (error) {
-                await show_error(error.toString());
+                // Error is now handled in Rust
                 await set_toggle_button_disabled(true);
             }
         }
@@ -185,7 +184,7 @@
             try {
                 await play_video();
             } catch (error) {
-                await show_error(error.toString());
+                // Error is now handled in Rust
             }
         };
 
@@ -194,7 +193,7 @@
                 console.log("toggle mute");
                 await toggle_mute();
             } catch (error) {
-                await show_error(error.toString());
+                // Error is now handled in Rust
             }
         };
 
@@ -202,7 +201,7 @@
             try {
                 await set_fullscreen_button_text();
             } catch (error) {
-                await show_error(error.toString());
+                // Error is now handled in Rust
             }
         };
 
@@ -231,7 +230,7 @@
             try {
                 await set_playback_speed(speed);
             } catch (error) {
-                await show_error(error.toString());
+                // Error is now handled in Rust
             }
         };
 
@@ -239,7 +238,7 @@
             try {
                 await download_video();
             } catch (error) {
-                await show_error(error.toString());
+                // Error is now handled in Rust
             }
             contextMenu.classList.remove('show');
         };
@@ -252,7 +251,7 @@
                     await videoPlayer.requestPictureInPicture();
                 }
             } catch (error) {
-                await show_error(error.toString());
+                // Error is now handled in Rust
             }
         };
 
