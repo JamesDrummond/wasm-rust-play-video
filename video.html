@@ -250,7 +250,11 @@
             update_fullscreen_button_text,
             seek_video,
             update_seek_bar,
-            download_video
+            download_video,
+            get_playback_speed,
+            set_playback_speed,
+            get_current_playback_speed,
+            update_playback_speed_active_state
         } from './pkg/wasm_rust_play_video.js';
         
         const errorMessage = document.getElementById('errorMessage');
@@ -382,7 +386,6 @@
         // Context menu functionality
         const contextMenu = document.getElementById('contextMenu');
         const playbackSpeedMenu = document.getElementById('playbackSpeedMenu');
-        let currentSpeed = 1.0;
 
         window.toggleContextMenu = function(event) {
             event.stopPropagation();
@@ -393,15 +396,6 @@
             playbackSpeedMenu.classList.remove('show');
         };
 
-        window.downloadVideo = async function() {
-            try {
-                await download_video();
-            } catch (error) {
-                await show_error(error.toString());
-            }
-            contextMenu.classList.remove('show');
-        };
-
         window.togglePlaybackSpeedMenu = function(event) {
             event.stopPropagation();
             const rect = event.target.getBoundingClientRect();
@@ -410,20 +404,24 @@
             playbackSpeedMenu.classList.toggle('show');
         };
 
-        window.setPlaybackSpeed = function(speed) {
-            currentSpeed = speed;
-            videoPlayer.playbackRate = speed;
-            playbackSpeedMenu.classList.remove('show');
+        window.setPlaybackSpeed = async function(speed) {
+            try {
+                await set_playback_speed(speed);
+                await update_playback_speed_active_state(speed);
+                playbackSpeedMenu.classList.remove('show');
+                contextMenu.classList.remove('show');
+            } catch (error) {
+                await show_error(error.toString());
+            }
+        };
+
+        window.downloadVideo = async function() {
+            try {
+                await download_video();
+            } catch (error) {
+                await show_error(error.toString());
+            }
             contextMenu.classList.remove('show');
-            
-            // Update active state
-            const speedOptions = playbackSpeedMenu.querySelectorAll('.speed-option');
-            speedOptions.forEach(option => {
-                option.classList.remove('active');
-                if (parseFloat(option.textContent) === speed) {
-                    option.classList.add('active');
-                }
-            });
         };
 
         window.togglePictureInPicture = async function() {
@@ -436,7 +434,6 @@
             } catch (error) {
                 await show_error(error.toString());
             }
-            contextMenu.classList.remove('show');
         };
 
         // Close menus when clicking outside

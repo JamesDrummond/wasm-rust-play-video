@@ -37,6 +37,7 @@ static VIDEO_STATE: Lazy<Mutex<VideoState>> = Lazy::new(|| {
     Mutex::new(VideoState {
         wasm_initialized: false,
         is_muted: false,
+        playback_speed: 1.0,
     })
 });
 
@@ -44,6 +45,7 @@ static VIDEO_STATE: Lazy<Mutex<VideoState>> = Lazy::new(|| {
 struct VideoState {
     wasm_initialized: bool,
     is_muted: bool,
+    playback_speed: f64,
 }
 
 fn get_video_element() -> Result<HtmlVideoElement, VideoError> {
@@ -391,6 +393,62 @@ pub async fn download_video() -> Result<(), JsValue> {
         .ok_or_else(|| VideoError::VideoOperationFailed("No body element found".to_string()))?
         .remove_child(&html_anchor)
         .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to remove anchor: {:?}", e)))?;
+    
+    hide_error()?;
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn get_playback_speed() -> Result<f64, JsValue> {
+    Logger::info("Entering get_playback_speed()").map_err(|e| VideoError::VideoOperationFailed(e.to_string()))?;
+    let video_element = get_video_element()?;
+    Ok(video_element.playback_rate())
+}
+
+#[wasm_bindgen]
+pub fn set_playback_speed(speed: f64) -> Result<(), JsValue> {
+    Logger::info("Entering set_playback_speed()").map_err(|e| VideoError::VideoOperationFailed(e.to_string()))?;
+    let video_element = get_video_element()?;
+    video_element.set_playback_rate(speed);
+    let mut state = VIDEO_STATE.lock().map_err(|e| VideoError::StateError(format!("Failed to lock state: {:?}", e)))?;
+    state.playback_speed = speed;
+    hide_error()?;
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn get_current_playback_speed() -> f64 {
+    Logger::info("Entering get_current_playback_speed()").map_err(|e| VideoError::VideoOperationFailed(e.to_string())).unwrap_or_default();
+    VIDEO_STATE.lock().unwrap().playback_speed
+}
+
+#[wasm_bindgen]
+pub fn update_playback_speed_active_state(speed: f64) -> Result<(), JsValue> {
+    Logger::info("Entering update_playback_speed_active_state()").map_err(|e| VideoError::VideoOperationFailed(e.to_string()))?;
+    let playback_speed_menu = get_element_by_id("playbackSpeedMenu")?;
+    let speed_options = playback_speed_menu.query_selector_all(".speed-option")
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get speed options: {:?}", e)))?;
+    
+    for i in 0..speed_options.length() {
+        let option = speed_options.get(i)
+            .ok_or_else(|| VideoError::VideoOperationFailed("Failed to get speed option".to_string()))?
+            .dyn_into::<web_sys::Element>()
+            .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to convert Node to Element: {:?}", e)))?;
+        
+        let text_content = option.text_content()
+            .ok_or_else(|| VideoError::VideoOperationFailed("No text content found".to_string()))?;
+        
+        let option_speed = text_content.replace('x', "").parse::<f64>()
+            .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to parse speed: {:?}", e)))?;
+        
+        if option_speed == speed {
+            option.set_attribute("class", "speed-option active")
+                .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to set active class: {:?}", e)))?;
+        } else {
+            option.set_attribute("class", "speed-option")
+                .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to remove active class: {:?}", e)))?;
+        }
+    }
     
     hide_error()?;
     Ok(())
