@@ -412,6 +412,8 @@ pub fn set_playback_speed(speed: f64) -> Result<(), JsValue> {
     video_element.set_playback_rate(speed);
     let mut state = VIDEO_STATE.lock().map_err(|e| VideoError::StateError(format!("Failed to lock state: {:?}", e)))?;
     state.playback_speed = speed;
+    update_playback_speed_active_state(speed)?;
+    hide_menus()?;
     hide_error()?;
     Ok(())
 }
@@ -449,6 +451,21 @@ pub fn update_playback_speed_active_state(speed: f64) -> Result<(), JsValue> {
                 .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to remove active class: {:?}", e)))?;
         }
     }
+    
+    hide_error()?;
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn hide_menus() -> Result<(), JsValue> {
+    Logger::info("Entering hide_menus()").map_err(|e| VideoError::VideoOperationFailed(e.to_string()))?;
+    let playback_speed_menu = get_element_by_id("playbackSpeedMenu")?;
+    let context_menu = get_element_by_id("contextMenu")?;
+    
+    playback_speed_menu.set_attribute("class", "playback-speed-menu")
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to hide playback speed menu: {:?}", e)))?;
+    context_menu.set_attribute("class", "context-menu")
+        .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to hide context menu: {:?}", e)))?;
     
     hide_error()?;
     Ok(())

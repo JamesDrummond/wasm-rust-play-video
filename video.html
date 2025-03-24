@@ -407,9 +407,6 @@
         window.setPlaybackSpeed = async function(speed) {
             try {
                 await set_playback_speed(speed);
-                await update_playback_speed_active_state(speed);
-                playbackSpeedMenu.classList.remove('show');
-                contextMenu.classList.remove('show');
             } catch (error) {
                 await show_error(error.toString());
             }
