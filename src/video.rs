@@ -290,4 +290,33 @@ pub fn update_mute_button_text() -> Result<(), JsValue> {
     button.set_text_content(Some(if is_muted { "Unmute" } else { "Mute" }));
     hide_error()?;
     Ok(())
+}
+
+#[wasm_bindgen]
+pub fn seek_video(percentage: f64) -> Result<(), JsValue> {
+    Logger::info("Entering seek_video()").map_err(|e| VideoError::VideoOperationFailed(e.to_string()))?;
+    let video_element = get_video_element()?;
+    let duration = video_element.duration();
+    if !duration.is_nan() {
+        let time = duration * (percentage / 100.0);
+        video_element.set_current_time(time);
+    }
+    hide_error()?;
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn update_seek_bar() -> Result<(), JsValue> {
+    Logger::info("Entering update_seek_bar()").map_err(|e| VideoError::VideoOperationFailed(e.to_string()))?;
+    let video_element = get_video_element()?;
+    let duration = video_element.duration();
+    if !duration.is_nan() {
+        let current_time = video_element.current_time();
+        let value = (current_time / duration) * 100.0;
+        let seek_bar = get_element_by_id("seekBar")?;
+        seek_bar.set_attribute("value", &value.to_string())
+            .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to update seek bar: {:?}", e)))?;
+    }
+    hide_error()?;
+    Ok(())
 } 

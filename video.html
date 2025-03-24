@@ -44,6 +44,41 @@
             flex-wrap: wrap;
         }
 
+        .seek-container {
+            width: 100%;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .seek-bar {
+            flex: 1;
+            height: 5px;
+            -webkit-appearance: none;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .seek-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .seek-bar::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
         .time-display {
             font-family: monospace;
             margin: 0 10px;
@@ -83,6 +118,9 @@
             <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
+        <div class="seek-container">
+            <input type="range" id="seekBar" class="seek-bar" min="0" max="100" value="0">
+        </div>
         <div class="controls">
             <button id="toggleButton" onclick="toggleVideo()">Play</button>
             <button id="muteButton" onclick="toggleMute()">Mute</button>
@@ -116,7 +154,9 @@
             set_mute_button_text,
             set_fullscreen_button_text,
             update_mute_button_text,
-            update_fullscreen_button_text
+            update_fullscreen_button_text,
+            seek_video,
+            update_seek_bar
         } from './pkg/wasm_rust_play_video.js';
         
         const errorMessage = document.getElementById('errorMessage');
@@ -126,6 +166,7 @@
         const currentTimeDisplay = document.getElementById('currentTime');
         const totalTimeDisplay = document.getElementById('totalTime');
         const videoPlayer = document.getElementById('videoPlayer');
+        const seekBar = document.getElementById('seekBar');
         let wasmInitialized = false;
 
         async function updateTimeDisplay() {
@@ -150,6 +191,24 @@
             
             // Update duration if it changes (some video formats might report duration later)
             videoPlayer.addEventListener('durationchange', updateTimeDisplay);
+
+            // Add seek bar event listeners
+            seekBar.addEventListener('input', async () => {
+                try {
+                    await seek_video(parseFloat(seekBar.value));
+                } catch (error) {
+                    await show_error(error.toString());
+                }
+            });
+
+            // Update seek bar as video plays
+            videoPlayer.addEventListener('timeupdate', async () => {
+                try {
+                    await update_seek_bar();
+                } catch (error) {
+                    await show_error(error.toString());
+                }
+            });
 
             // Add event listeners for play/pause state
             videoPlayer.addEventListener('play', async () => {
