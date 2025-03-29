@@ -78,8 +78,10 @@
             set_playback_speed,
             get_current_playback_speed,
             update_playback_speed_active_state,
-            position_playback_speed_menu,
-            position_context_menu
+            toggle_context_menu,
+            toggle_playback_speed_menu,
+            toggle_picture_in_picture,
+            init_wasm
         } from './pkg/wasm_rust_play_video.js';
         
         const errorMessage = document.getElementById('errorMessage');
@@ -90,6 +92,8 @@
         const totalTimeDisplay = document.getElementById('totalTime');
         const videoPlayer = document.getElementById('videoPlayer');
         const seekBar = document.getElementById('seekBar');
+        const contextMenu = document.getElementById('contextMenu');
+        const playbackSpeedMenu = document.getElementById('playbackSpeedMenu');
         let wasmInitialized = false;
 
         async function updateTimeDisplay() {
@@ -134,49 +138,21 @@
             document.addEventListener('fullscreenchange', async () => await update_fullscreen_button_text());
         }
 
-        async function initWasm() {
-            try {
-                await init();
-                await set_wasm_initialized(true);
-                wasmInitialized = await get_wasm_initialized();
-                await setupEventListeners();
-            } catch (error) {
-                // Error is now handled in Rust
-                await set_toggle_button_disabled(true);
-            }
-        }
-
         // Define global functions for button clicks
         window.toggleVideo = async() => await play_video();
         window.toggleMute = async() => await toggle_mute();
-
         window.toggleFullscreen = async() => await toggle_fullscreen();
-
-        // Context menu functionality
-        const contextMenu = document.getElementById('contextMenu');
-        const playbackSpeedMenu = document.getElementById('playbackSpeedMenu');
-
         window.toggleContextMenu = function(event) {
             event.stopPropagation();
-            position_context_menu(event.clientX, event.clientY);
+            toggle_context_menu(event.clientX, event.clientY);
         };
-
         window.togglePlaybackSpeedMenu = function(event) {
             event.stopPropagation();
-            position_playback_speed_menu(event.clientX, event.clientY);
+            toggle_playback_speed_menu(event.clientX, event.clientY);
         };
-
         window.setPlaybackSpeed = async(speed) => await set_playback_speed(speed);
-
         window.downloadVideo = async() => await download_video();
-
-        window.togglePictureInPicture = async function() {
-            if (document.pictureInPictureElement) {
-                await document.exitPictureInPicture();
-            } else if (document.pictureInPictureEnabled) {
-                await videoPlayer.requestPictureInPicture();
-            }
-        };
+        window.togglePictureInPicture = async() => await toggle_picture_in_picture();
 
         // Close menus when clicking outside
         document.addEventListener('click', function(event) {
@@ -187,7 +163,11 @@
         });
 
         // Initialize WASM module
-        initWasm();
+        init().then(async () => {
+            await init_wasm();
+        }).catch(error => {
+            set_toggle_button_disabled(true);
+        });
     </script>
 </body>
 </html> 

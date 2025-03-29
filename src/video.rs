@@ -33,7 +33,7 @@ impl From<VideoError> for JsValue {
     }
 }
 
-static VIDEO_STATE: Lazy<Mutex<VideoState>> = Lazy::new(|| {
+pub static VIDEO_STATE: Lazy<Mutex<VideoState>> = Lazy::new(|| {
     Mutex::new(VideoState {
         wasm_initialized: false,
         is_muted: false,
