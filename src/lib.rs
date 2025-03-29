@@ -1,10 +1,12 @@
 use wasm_bindgen::prelude::*;
+use web_sys::{Document, Element, HtmlElement, Window};
 
 mod mock_client;
 mod post_client;
 mod video;
 mod logger;
 use mock_client::MockHttpClient;
+use post_client::fetch_post;
 
 #[wasm_bindgen]
 extern "C" {
@@ -12,6 +14,48 @@ extern "C" {
     // `log(..)`
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
+}
+
+#[wasm_bindgen]
+pub async fn init_app() -> Result<(), JsValue> {
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    
+    // Test the greet function
+    let greeting = greet("WebAssembly").await?;
+    let result_div = document.get_element_by_id("result").unwrap();
+    result_div.set_inner_html(&format!(
+        "<p>{}</p><p>2 + 3 = {}</p>",
+        greeting,
+        add(2, 3)
+    ));
+
+    // Set up click handler for fetch button
+    let fetch_button = document.get_element_by_id("fetchPost").unwrap();
+    let post_content = document.get_element_by_id("postContent").unwrap();
+    
+    let closure = Closure::wrap(Box::new(move || {
+        let post_content = post_content.clone();
+        wasm_bindgen_futures::spawn_local(async move {
+            match fetch_post().await {
+                Ok(post_data) => {
+                    let html_content = post_data.replace('\n', "<br>");
+                    post_content.set_inner_html(&html_content);
+                }
+                Err(error) => {
+                    log(&format!("Error fetching post: {:?}", error));
+                    post_content.set_inner_html("Error fetching post data");
+                }
+            }
+        });
+    }) as Box<dyn FnMut()>);
+    
+    fetch_button.add_event_listener_with_callback(
+        "click",
+        closure.into_js_value().unchecked_ref(),
+    )?;
+
+    Ok(())
 }
 
 #[wasm_bindgen]

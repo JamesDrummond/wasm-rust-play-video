@@ -25,29 +25,11 @@
     <button id="fetchPost">Fetch Post</button>
     <div id="postContent" class="post-content"></div>
     <script type="module">
-        import init, { greet, add } from './pkg/wasm_rust_play_video.js';
-        import { fetch_post } from './pkg/wasm_rust_play_video.js';
+        import init, { init_app } from './pkg/wasm_rust_play_video.js';
 
         async function run() {
             await init();
-            
-            // Test the greet function
-            const greeting = await greet("WebAssembly");
-            document.getElementById('result').innerHTML = `
-                <p>${greeting}</p>
-                <p>2 + 3 = ${add(2, 3)}</p>
-            `;
-
-            // Add click handler for fetch button
-            document.getElementById('fetchPost').addEventListener('click', async () => {
-                try {
-                    const postData = await fetch_post();
-                    document.getElementById('postContent').innerHTML = postData.replace(/\n/g, '<br>');
-                } catch (error) {
-                    console.error('Error fetching post:', error);
-                    document.getElementById('postContent').innerHTML = 'Error fetching post data';
-                }
-            });
+            await init_app();
         }
 
         run();
