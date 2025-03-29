@@ -16,8 +16,8 @@ extern "C" {
     fn log(s: &str);
 }
 
-#[wasm_bindgen]
-pub async fn init_app() -> Result<(), JsValue> {
+#[wasm_bindgen(start)]
+pub async fn init() -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     
