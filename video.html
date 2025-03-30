@@ -47,45 +47,10 @@
 
     <script type="module">
         import init, { 
-            play_video, 
-            toggle_mute, 
-            toggle_fullscreen,
-            get_video_time,
-            get_video_duration,
-            show_error,
-            format_time,
-            is_video_playing,
-            is_video_muted,
-            is_fullscreen,
-            update_time_display,
-            get_wasm_initialized,
-            set_wasm_initialized,
-            get_is_muted,
-            set_is_muted,
             set_toggle_button_disabled,
-            set_toggle_button_text,
-            set_mute_button_text,
-            set_fullscreen_button_text,
-            update_mute_button_text,
-            update_fullscreen_button_text,
-            download_video,
-            get_playback_speed,
-            set_playback_speed,
-            get_current_playback_speed,
-            update_playback_speed_active_state,
-            toggle_context_menu,
-            toggle_playback_speed_menu,
-            toggle_picture_in_picture,
             init_wasm
         } from './pkg/wasm_rust_play_video.js';
         
-
-        // Define global functions for button clicks
-        window.toggleContextMenu = function(event) {
-            event.stopPropagation();
-            toggle_context_menu(event.clientX, event.clientY);
-        };
-
         // Initialize WASM module
         init().then(async () => {
             await init_wasm();
