@@ -1,19 +1,11 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{
     HtmlVideoElement,
-    HtmlElement,
-    Event,
+    HtmlElement
 };
 use crate::logger::Logger;
-use wasm_bindgen_futures::spawn_local;
-use crate::player::play_pause::{play_video, set_toggle_play};
-use crate::player::mute::{toggle_mute, update_mute_button_text};
-use crate::player::fullscreen::{toggle_fullscreen, update_fullscreen_button_text};
 use crate::player::error::{show_error, hide_error, VideoError};
 use crate::player::state::VIDEO_STATE;
-use crate::player::time::update_time_display;
-use crate::player::download::download_video;
-use crate::player::menu::{position_playback_speed_menu, position_context_menu};
 use crate::player::event_listeners::setup_event_listeners;
 
 pub fn get_video_element() -> Result<HtmlVideoElement, VideoError> {

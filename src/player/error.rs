@@ -1,6 +1,5 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
-use web_sys::HtmlElement;
 
 #[derive(Debug)]
 pub enum VideoError {
