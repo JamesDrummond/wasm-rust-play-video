@@ -15,7 +15,7 @@
             Your browser does not support the video tag.
         </video>
         <div class="controls">
-            <button id="toggleButton" onclick="toggleVideo()">Play</button>
+            <button id="toggleButton">Play</button>
             <button id="muteButton" onclick="toggleMute()">Mute</button>
             <button id="fullscreenButton" onclick="toggleFullscreen()">Fullscreen</button>
             <button id="menuButton" class="menu-button" onclick="toggleContextMenu(event)">⋮</button>
@@ -98,7 +98,6 @@
         }
 
         // Define global functions for button clicks
-        window.toggleVideo = async() => await play_video();
         window.toggleMute = async() => await toggle_mute();
         window.toggleFullscreen = async() => await toggle_fullscreen();
         window.toggleContextMenu = function(event) {

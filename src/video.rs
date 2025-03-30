@@ -981,6 +981,26 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
         closure.forget();
     }
 
+    // Toggle button click event listener
+    {
+        let closure = Closure::wrap(Box::new(move || {
+            let play_video = play_video();
+            spawn_local(async move {
+                play_video.await.unwrap_or_default();
+            });
+        }) as Box<dyn FnMut()>);
+        
+        let toggle_button = document
+            .get_element_by_id("toggleButton")
+            .ok_or(VideoError::ElementNotFound("toggleButton".to_string()))?;
+            
+        toggle_button.add_event_listener_with_callback(
+            "click",
+            closure.as_ref().unchecked_ref(),
+        )?;
+        closure.forget();
+    }
+
     Ok(())
 }
 
