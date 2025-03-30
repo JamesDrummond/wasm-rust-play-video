@@ -6,7 +6,7 @@ pub mod picture_in_picture;
 pub mod play_pause;
 pub mod state;
 pub mod time;
-pub mod video;
+pub mod player;
 pub mod download;
 pub mod event_listeners;
 pub mod playback_speed;
