@@ -2,6 +2,7 @@ use wasm_bindgen::prelude::*;
 use crate::logger::Logger;
 use crate::player::video::{get_video_element, get_element_by_id};
 use crate::player::error::{show_error, hide_error, VideoError};
+use crate::player::state::VIDEO_STATE;
 
 #[wasm_bindgen]
 pub fn toggle_mute() -> Result<bool, JsValue> {
@@ -60,6 +61,25 @@ pub fn update_mute_button_text() -> Result<(), JsValue> {
     let is_muted = is_video_muted()?;
     let button = get_element_by_id("muteButton")?;
     button.set_text_content(Some(if is_muted { "Unmute" } else { "Mute" }));
+    hide_error()?;
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn set_is_muted(value: bool) -> Result<(), JsValue> {
+    Logger::info("Entering set_is_muted()").map_err(|e| {
+        let error = VideoError::VideoOperationFailed(e.to_string());
+        show_error(&error.to_string()).unwrap_or_default();
+        error
+    })?;
+    let mut result = VIDEO_STATE.lock().map_err(|e| {
+        let error = VideoError::StateError(format!("Failed to lock state: {:?}", e));
+        show_error(&error.to_string()).unwrap_or_default();
+        error
+    })?;
+    if result.is_muted != value {
+        result.is_muted = value;
+    }
     hide_error()?;
     Ok(())
 } 

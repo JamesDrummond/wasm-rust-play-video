@@ -72,25 +72,6 @@ pub fn get_is_muted() -> bool {
 }
 
 #[wasm_bindgen]
-pub fn set_is_muted(value: bool) -> Result<(), JsValue> {
-    Logger::info("Entering set_is_muted()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let mut result = VIDEO_STATE.lock().map_err(|e| {
-        let error = VideoError::StateError(format!("Failed to lock state: {:?}", e));
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    if result.is_muted != value {
-        result.is_muted = value;
-    }
-    hide_error()?;
-    Ok(())
-}
-
-#[wasm_bindgen]
 pub async fn download_video() -> Result<(), JsValue> {
     Logger::info("Entering download_video()").map_err(|e| {
         let error = VideoError::VideoOperationFailed(e.to_string());
