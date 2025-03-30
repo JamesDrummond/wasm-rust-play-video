@@ -76,7 +76,7 @@ fn get_element_by_id(id: &str) -> Result<web_sys::Element, VideoError> {
 }
 
 #[wasm_bindgen]
-pub fn play_video() -> Result<(), JsValue> {
+pub async fn play_video() -> Result<(), JsValue> {
     Logger::info("Entering play_video()").map_err(|e| {
         let error = VideoError::VideoOperationFailed(e.to_string());
         show_error(&error.to_string()).unwrap_or_default();
@@ -96,7 +96,7 @@ pub fn play_video() -> Result<(), JsValue> {
             show_error(&error.to_string()).unwrap_or_default();
             error
         })?;
-        set_toggle_button_text("Play")?;
+        set_toggle_button_text("Play").await?;
     } else {
         Logger::info("Playing video").map_err(|e| {
             let error = VideoError::VideoOperationFailed(e.to_string());
@@ -108,7 +108,7 @@ pub fn play_video() -> Result<(), JsValue> {
             show_error(&error.to_string()).unwrap_or_default();
             error
         })?;
-        set_toggle_button_text("Pause")?;
+        set_toggle_button_text("Pause").await?;
     }
     
     hide_error()?;
@@ -396,7 +396,7 @@ pub fn set_toggle_button_disabled(disabled: bool) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn set_toggle_button_text(text: &str) -> Result<(), JsValue> {
+pub async fn set_toggle_button_text(text: &str) -> Result<(), JsValue> {
     Logger::info("Entering set_toggle_button_text()").map_err(|e| {
         let error = VideoError::VideoOperationFailed(e.to_string());
         show_error(&error.to_string()).unwrap_or_default();
@@ -930,7 +930,10 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
     // Play event listener
     {
         let closure = Closure::wrap(Box::new(move || {
-            set_toggle_button_text("Pause").unwrap_or_default();
+            let set_text = set_toggle_button_text("Pause");
+            spawn_local(async move {
+                set_text.await.unwrap_or_default();
+            });
         }) as Box<dyn FnMut()>);
         video_player.add_event_listener_with_callback(
             "play",
@@ -942,7 +945,10 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
     // Pause event listener
     {
         let closure = Closure::wrap(Box::new(move || {
-            set_toggle_button_text("Play").unwrap_or_default();
+            let set_text = set_toggle_button_text("Play");
+            spawn_local(async move {
+                set_text.await.unwrap_or_default();
+            });
         }) as Box<dyn FnMut()>);
         video_player.add_event_listener_with_callback(
             "pause",

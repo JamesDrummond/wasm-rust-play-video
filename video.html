@@ -97,14 +97,6 @@
             }
         }
 
-        async function setupEventListeners() {
-
-            // Add event listeners for play/pause state
-            videoPlayer.addEventListener('play', async () => await set_toggle_button_text('Pause'));
-
-            videoPlayer.addEventListener('pause', async () => await set_toggle_button_text('Play'));
-        }
-
         // Define global functions for button clicks
         window.toggleVideo = async() => await play_video();
         window.toggleMute = async() => await toggle_mute();
@@ -124,7 +116,6 @@
         // Initialize WASM module
         init().then(async () => {
             await init_wasm();
-            await setupEventListeners();
         }).catch(error => {
             set_toggle_button_disabled(true);
         });
