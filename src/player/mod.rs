@@ -3,6 +3,7 @@ pub mod play_pause;
 pub mod mute;
 pub mod fullscreen;
 pub mod error;
+pub mod state;
 
 #[allow(unused_imports)]
 pub use video::*;

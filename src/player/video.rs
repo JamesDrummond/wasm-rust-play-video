@@ -4,14 +4,13 @@ use web_sys::{
     HtmlElement,
     Event,
 };
-use std::sync::Mutex;
-use once_cell::sync::Lazy;
 use crate::logger::Logger;
 use wasm_bindgen_futures::spawn_local;
 use crate::player::play_pause::{play_video, set_toggle_play};
 use crate::player::mute::{toggle_mute, update_mute_button_text};
 use crate::player::fullscreen::{toggle_fullscreen, update_fullscreen_button_text};
 use crate::player::error::{show_error, hide_error};
+use crate::player::state::VIDEO_STATE;
 
 #[derive(Debug)]
 pub enum VideoError {
@@ -40,21 +39,6 @@ impl From<VideoError> for JsValue {
     fn from(error: VideoError) -> Self {
         JsValue::from_str(&error.to_string())
     }
-}
-
-pub static VIDEO_STATE: Lazy<Mutex<VideoState>> = Lazy::new(|| {
-    Mutex::new(VideoState {
-        wasm_initialized: false,
-        is_muted: false,
-        playback_speed: 1.0,
-    })
-});
-
-#[derive(Clone)]
-pub struct VideoState {
-    wasm_initialized: bool,
-    is_muted: bool,
-    playback_speed: f64,
 }
 
 pub fn get_video_element() -> Result<HtmlVideoElement, VideoError> {

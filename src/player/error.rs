@@ -1,5 +1,4 @@
 use wasm_bindgen::prelude::*;
-use web_sys::Element;
 use crate::logger::Logger;
 use crate::player::video::{get_element_by_id, VideoError};
 
