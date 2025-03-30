@@ -47,7 +47,7 @@
 
     <script type="module">
         import init, { 
-            set_toggle_button_disabled,
+            show_error,
             init_video
         } from './pkg/wasm_rust_play_video.js';
         
@@ -55,7 +55,7 @@
         init().then(async () => {
             await init_video();
         }).catch(error => {
-            set_toggle_button_disabled(true);
+            show_error("Failed to initialize video player. Please refresh the page.");
         });
         
     </script>

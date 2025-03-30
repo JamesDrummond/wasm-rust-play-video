@@ -369,23 +369,6 @@ pub fn set_is_muted(value: bool) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn set_toggle_button_disabled(disabled: bool) -> Result<(), JsValue> {
-    Logger::info("Entering set_toggle_button_disabled()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let button = get_element_by_id("toggleButton")?;
-    button.set_attribute("disabled", if disabled { "true" } else { "false" })
-        .map_err(|e| {
-            let error = VideoError::VideoOperationFailed(format!("Failed to set button disabled state: {:?}", e));
-            show_error(&error.to_string()).unwrap_or_default();
-            error
-        })?;
-    Ok(())
-}
-
-#[wasm_bindgen]
 pub async fn set_toggle_button_text(text: &str) -> Result<(), JsValue> {
     Logger::info("Entering set_toggle_button_text()").map_err(|e| {
         let error = VideoError::VideoOperationFailed(e.to_string());
