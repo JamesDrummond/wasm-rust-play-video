@@ -1,7 +1,8 @@
 use wasm_bindgen::prelude::*;
 use crate::logger::Logger;
 use crate::player::error::{show_error, hide_error, VideoError};
-use crate::player::video::{get_video_element, hide_menus};
+use crate::player::video::get_video_element;
+use crate::player::menu::hide_menus;
 
 #[wasm_bindgen]
 pub async fn download_video() -> Result<(), JsValue> {

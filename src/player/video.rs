@@ -54,33 +54,6 @@ pub fn set_wasm_initialized(value: bool) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn hide_menus() -> Result<(), JsValue> {
-    Logger::info("Entering hide_menus()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let playback_speed_menu = get_element_by_id("playbackSpeedMenu")?;
-    let context_menu = get_element_by_id("contextMenu")?;
-    
-    playback_speed_menu.set_attribute("class", "playback-speed-menu")
-        .map_err(|e| {
-            let error = VideoError::VideoOperationFailed(format!("Failed to hide playback speed menu: {:?}", e));
-            show_error(&error.to_string()).unwrap_or_default();
-            error
-        })?;
-    context_menu.set_attribute("class", "context-menu")
-        .map_err(|e| {
-            let error = VideoError::VideoOperationFailed(format!("Failed to hide context menu: {:?}", e));
-            show_error(&error.to_string()).unwrap_or_default();
-            error
-        })?;
-    
-    hide_error()?;
-    Ok(())
-}
-
-#[wasm_bindgen]
 pub fn init_video() -> Result<(), JsValue> {
     setup_event_listeners()?;
     set_wasm_initialized(true)?;

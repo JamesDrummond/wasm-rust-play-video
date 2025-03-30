@@ -2,7 +2,8 @@ use wasm_bindgen::prelude::*;
 use crate::logger::Logger;
 use crate::player::error::{show_error, hide_error, VideoError};
 use crate::player::state::VIDEO_STATE;
-use crate::player::video::{get_video_element, get_element_by_id, hide_menus};
+use crate::player::video::{get_video_element, get_element_by_id};
+use crate::player::menu::hide_menus;
 
 #[wasm_bindgen]
 pub fn get_playback_speed() -> Result<f64, JsValue> {
