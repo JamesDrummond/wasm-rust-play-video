@@ -62,10 +62,13 @@ impl MockHttpClient {
 }
 
 #[cfg(test)]
+#[allow(dead_code)]
 mod tests {
     use super::*;
     use wasm_bindgen_test::*;
 
+    // These tests must run in the browser because they use wasm-bindgen
+    // To run these tests, use: wasm-pack test --chrome
     wasm_bindgen_test_configure!(run_in_browser);
 
     #[wasm_bindgen_test]
