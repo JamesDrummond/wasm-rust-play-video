@@ -18,12 +18,12 @@ extern "C" {
 
 #[wasm_bindgen(start)]
 pub async fn init() -> Result<(), JsValue> {
-    let window = web_sys::window().unwrap();
-    let document = window.document().unwrap();
+    let window = web_sys::window().ok_or_else(|| JsValue::from_str("Window not found"))?;
+    let document = window.document().ok_or_else(|| JsValue::from_str("Document not found"))?;
     
     // Test the greet function
     let greeting = greet("WebAssembly").await?;
-    let result_div = document.get_element_by_id("result").unwrap();
+    let result_div = document.get_element_by_id("result").ok_or_else(|| JsValue::from_str("Result div not found"))?;
     result_div.set_inner_html(&format!(
         "<p>{}</p><p>2 + 3 = {}</p>",
         greeting,
@@ -31,8 +31,8 @@ pub async fn init() -> Result<(), JsValue> {
     ));
 
     // Set up click handler for fetch button
-    let fetch_button = document.get_element_by_id("fetchPost").unwrap();
-    let post_content = document.get_element_by_id("postContent").unwrap();
+    let fetch_button = document.get_element_by_id("fetchPost").ok_or_else(|| JsValue::from_str("Fetch button not found"))?;
+    let post_content = document.get_element_by_id("postContent").ok_or_else(|| JsValue::from_str("Post content div not found"))?;
     
     let closure = Closure::wrap(Box::new(move || {
         let post_content = post_content.clone();

@@ -1001,6 +1001,41 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
         closure.forget();
     }
 
+    // Mute button click event listener
+    {
+        let closure = Closure::wrap(Box::new(move || {
+            toggle_mute().unwrap_or_default();
+        }) as Box<dyn FnMut()>);
+        
+        let mute_button = document
+            .get_element_by_id("muteButton")
+            .ok_or(VideoError::ElementNotFound("muteButton".to_string()))?;
+            
+        mute_button.add_event_listener_with_callback(
+            "click",
+            closure.as_ref().unchecked_ref(),
+        )?;
+        closure.forget();
+    }
+
+    // Fullscreen button click event listener
+    {
+        let closure = Closure::wrap(Box::new(move || {
+            toggle_fullscreen().unwrap_or_default();
+        }) as Box<dyn FnMut()>);
+        
+        let fullscreen_button = document
+            .get_element_by_id("fullscreenButton")
+            .ok_or(VideoError::ElementNotFound("fullscreenButton".to_string()))?;
+            
+        fullscreen_button.add_event_listener_with_callback(
+            "click",
+            closure.as_ref().unchecked_ref(),
+        )?;
+        closure.forget();
+    }
+
+
     Ok(())
 }
 
