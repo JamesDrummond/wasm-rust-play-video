@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 use crate::logger::Logger;
-use crate::player::video::{get_video_element, get_element_by_id, show_error, hide_error, VideoError};
+use crate::player::video::{get_video_element, get_element_by_id, VideoError};
+use crate::player::error::{show_error, hide_error};
 
 #[wasm_bindgen]
 pub fn toggle_mute() -> Result<bool, JsValue> {

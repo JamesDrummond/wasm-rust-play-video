@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 use crate::logger::Logger;
-use crate::player::video::{VideoError, get_video_element, get_element_by_id, show_error, hide_error};
+use crate::player::video::{VideoError, get_video_element, get_element_by_id};
+use crate::player::error::{show_error, hide_error};
 
 #[wasm_bindgen]
 pub async fn set_toggle_play(text: &str) -> Result<(), JsValue> {

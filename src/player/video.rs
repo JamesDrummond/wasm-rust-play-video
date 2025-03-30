@@ -11,6 +11,7 @@ use wasm_bindgen_futures::spawn_local;
 use crate::player::play_pause::{play_video, set_toggle_play};
 use crate::player::mute::{toggle_mute, update_mute_button_text};
 use crate::player::fullscreen::{toggle_fullscreen, update_fullscreen_button_text};
+use crate::player::error::{show_error, hide_error};
 
 #[derive(Debug)]
 pub enum VideoError {
@@ -95,44 +96,6 @@ pub fn get_video_duration() -> Result<f64, JsValue> {
     })?;
     let video_element = get_video_element()?;
     Ok(video_element.duration())
-}
-
-#[wasm_bindgen]
-pub fn show_error(message: &str) -> Result<(), JsValue> {
-    Logger::info("Entering show_error()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    Logger::error(message).map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let error_element = get_element_by_id("errorMessage")?;
-    error_element.set_text_content(Some(message));
-    error_element.set_attribute("style", "display: block").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(format!("Failed to show error: {:?}", e));
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    Ok(())
-}
-
-#[wasm_bindgen]
-pub fn hide_error() -> Result<(), JsValue> {
-    Logger::info("Entering hide_error()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let error_element = get_element_by_id("errorMessage")?;
-    error_element.set_attribute("style", "display: none").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(format!("Failed to hide error: {:?}", e));
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    Ok(())
 }
 
 #[wasm_bindgen]
