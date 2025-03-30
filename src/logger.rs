@@ -36,14 +36,6 @@ impl Logger {
         Ok(())
     }
 
-    pub fn error(message: &str) -> Result<(), LoggerError> {
-        if message.is_empty() {
-            return Err(LoggerError::InvalidMessage("Message cannot be empty".to_string()));
-        }
-        console::error_1(&JsValue::from_str(message));
-        Ok(())
-    }
-
     #[cfg(test)]
     pub fn warn(message: &str) -> Result<(), LoggerError> {
         if message.is_empty() {
