@@ -79,10 +79,6 @@
             init_wasm
         } from './pkg/wasm_rust_play_video.js';
         
-        const videoPlayer = document.getElementById('videoPlayer');
-        const contextMenu = document.getElementById('contextMenu');
-        const playbackSpeedMenu = document.getElementById('playbackSpeedMenu');
-        let wasmInitialized = false;
 
         // Define global functions for button clicks
         window.toggleContextMenu = function(event) {
