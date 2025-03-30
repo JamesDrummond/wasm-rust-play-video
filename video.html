@@ -98,25 +98,11 @@
         }
 
         async function setupEventListeners() {
-            // Update time display when video time changes
-            videoPlayer.addEventListener('timeupdate', updateTimeDisplay);
-            
-            // Update duration when video metadata is loaded
-            videoPlayer.addEventListener('loadedmetadata', updateTimeDisplay);
-            
-            // Update duration if it changes (some video formats might report duration later)
-            videoPlayer.addEventListener('durationchange', updateTimeDisplay);
 
             // Add event listeners for play/pause state
             videoPlayer.addEventListener('play', async () => await set_toggle_button_text('Pause'));
 
             videoPlayer.addEventListener('pause', async () => await set_toggle_button_text('Play'));
-
-            // Add event listener for mute state changes
-            videoPlayer.addEventListener('volumechange', async () => await update_mute_button_text());
-
-            // Add event listener for fullscreen state changes
-            videoPlayer.addEventListener('fullscreenchange', async () => await update_fullscreen_button_text());
         }
 
         // Define global functions for button clicks
