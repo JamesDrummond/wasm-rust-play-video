@@ -84,19 +84,6 @@
         const playbackSpeedMenu = document.getElementById('playbackSpeedMenu');
         let wasmInitialized = false;
 
-        async function updateTimeDisplay() {
-            if(!wasmInitialized) {
-                wasmInitialized = await get_wasm_initialized();
-                if(!wasmInitialized)
-                    return;
-            }
-            try {
-                update_time_display();
-            } catch (error) {
-                // Error is now handled in Rust
-            }
-        }
-
         // Define global functions for button clicks
         window.toggleContextMenu = function(event) {
             event.stopPropagation();
