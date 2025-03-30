@@ -98,19 +98,10 @@
         }
 
         // Define global functions for button clicks
-        window.toggleMute = async() => await toggle_mute();
-        window.toggleFullscreen = async() => await toggle_fullscreen();
         window.toggleContextMenu = function(event) {
             event.stopPropagation();
             toggle_context_menu(event.clientX, event.clientY);
         };
-        window.togglePlaybackSpeedMenu = function(event) {
-            event.stopPropagation();
-            toggle_playback_speed_menu(event.clientX, event.clientY);
-        };
-        window.setPlaybackSpeed = async(speed) => await set_playback_speed(speed);
-        window.downloadVideo = async() => await download_video();
-        window.togglePictureInPicture = async() => await toggle_picture_in_picture();
 
         // Initialize WASM module
         init().then(async () => {
