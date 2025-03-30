@@ -246,11 +246,6 @@ pub fn hide_error() -> Result<(), JsValue> {
 
 #[wasm_bindgen]
 pub fn format_time(seconds: f64) -> String {
-    Logger::info("Entering format_time()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    }).unwrap_or_default();
     let minutes = (seconds / 60.0).floor() as i32;
     let remaining_seconds = (seconds % 60.0).floor() as i32;
     format!("{}:{:02}", minutes, remaining_seconds)
@@ -300,11 +295,6 @@ pub fn is_fullscreen() -> Result<bool, JsValue> {
 
 #[wasm_bindgen]
 pub async fn update_time_display() -> Result<(), JsValue> {
-    Logger::info("Entering update_time_display()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
     let video_element = get_video_element()?;
     let current_time = video_element.current_time();
     let duration = video_element.duration();
