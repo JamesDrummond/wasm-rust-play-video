@@ -1134,6 +1134,28 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
         }
     }
 
+    // Menu button click event listener
+    {
+        let closure = Closure::wrap(Box::new(move |event: Event| {
+            if let Some(mouse_event) = event.dyn_into::<web_sys::MouseEvent>().ok() {
+                // Stop event propagation
+                mouse_event.stop_propagation();
+                // Show context menu at button position
+                let _ = position_context_menu(mouse_event.client_x() as f64, mouse_event.client_y() as f64);
+            }
+        }) as Box<dyn FnMut(Event)>);
+        
+        let menu_button = document
+            .get_element_by_id("menuButton")
+            .ok_or(VideoError::ElementNotFound("menuButton".to_string()))?;
+            
+        menu_button.add_event_listener_with_callback(
+            "click",
+            closure.as_ref().unchecked_ref(),
+        )?;
+        closure.forget();
+    }
+
     Ok(())
 }
 
