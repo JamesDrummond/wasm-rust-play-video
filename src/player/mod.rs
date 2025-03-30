@@ -2,6 +2,7 @@ pub mod error;
 pub mod fullscreen;
 pub mod menu;
 pub mod mute;
+pub mod picture_in_picture;
 pub mod play_pause;
 pub mod state;
 pub mod time;
