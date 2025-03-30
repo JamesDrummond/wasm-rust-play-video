@@ -462,47 +462,6 @@ pub fn update_mute_button_text() -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn seek_video(percentage: f64) -> Result<(), JsValue> {
-    Logger::info("Entering seek_video()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let video_element = get_video_element()?;
-    let duration = video_element.duration();
-    if !duration.is_nan() {
-        let time = duration * (percentage / 100.0);
-        video_element.set_current_time(time);
-    }
-    hide_error()?;
-    Ok(())
-}
-
-#[wasm_bindgen]
-pub fn update_seek_bar() -> Result<(), JsValue> {
-    Logger::info("Entering update_seek_bar()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let video_element = get_video_element()?;
-    let duration = video_element.duration();
-    if !duration.is_nan() {
-        let current_time = video_element.current_time();
-        let value = (current_time / duration) * 100.0;
-        let seek_bar = get_element_by_id("seekBar")?;
-        seek_bar.set_attribute("value", &value.to_string())
-            .map_err(|e| {
-                let error = VideoError::VideoOperationFailed(format!("Failed to update seek bar: {:?}", e));
-                show_error(&error.to_string()).unwrap_or_default();
-                error
-            })?;
-    }
-    hide_error()?;
-    Ok(())
-}
-
-#[wasm_bindgen]
 pub async fn download_video() -> Result<(), JsValue> {
     Logger::info("Entering download_video()").map_err(|e| {
         let error = VideoError::VideoOperationFailed(e.to_string());
@@ -889,11 +848,6 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
         .ok_or(VideoError::ElementNotFound("videoPlayer".to_string()))?
         .dyn_into::<HtmlVideoElement>()?;
 
-    let seek_bar = document
-        .get_element_by_id("seekBar")
-        .ok_or(VideoError::ElementNotFound("seekBar".to_string()))?
-        .dyn_into::<HtmlElement>()?;
-
     // Time update event listener
     {
         let closure = Closure::wrap(Box::new(move || {
@@ -939,18 +893,6 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
         closure.forget();
     }
 
-    // Seek bar update event listener
-    {
-        let closure = Closure::wrap(Box::new(move || {
-            update_seek_bar().unwrap_or_default();
-        }) as Box<dyn FnMut()>);
-        video_player.add_event_listener_with_callback(
-            "timeupdate",
-            closure.as_ref().unchecked_ref(),
-        )?;
-        closure.forget();
-    }
-
     // Play event listener
     {
         let closure = Closure::wrap(Box::new(move || {
@@ -982,21 +924,6 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
         }) as Box<dyn FnMut()>);
         video_player.add_event_listener_with_callback(
             "volumechange",
-            closure.as_ref().unchecked_ref(),
-        )?;
-        closure.forget();
-    }
-
-    // Seek bar input event listener
-    {
-        let seek_bar_value = seek_bar.get_attribute("value").unwrap_or_default();
-        let closure = Closure::wrap(Box::new(move || {
-            if let Ok(value) = seek_bar_value.parse::<f64>() {
-                seek_video(value).unwrap_or_default();
-            }
-        }) as Box<dyn FnMut()>);
-        seek_bar.add_event_listener_with_callback(
-            "input",
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();

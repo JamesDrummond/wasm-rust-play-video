@@ -36,42 +36,6 @@ h1 {
     flex-wrap: wrap;
 }
 
-.seek-container {
-    width: 100%;
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.seek-bar {
-    flex: 1;
-    height: 5px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: #ddd;
-    border-radius: 5px;
-    outline: none;
-}
-
-.seek-bar::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 15px;
-    height: 15px;
-    background: #007bff;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.seek-bar::-moz-range-thumb {
-    width: 15px;
-    height: 15px;
-    background: #007bff;
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-}
-
 .time-display {
     font-family: monospace;
     margin: 0 10px;

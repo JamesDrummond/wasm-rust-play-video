@@ -14,9 +14,6 @@
             <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
-        <div class="seek-container">
-            <input type="range" id="seekBar" class="seek-bar" min="0" max="100" value="0">
-        </div>
         <div class="controls">
             <button id="toggleButton" onclick="toggleVideo()">Play</button>
             <button id="muteButton" onclick="toggleMute()">Mute</button>
@@ -71,8 +68,6 @@
             set_fullscreen_button_text,
             update_mute_button_text,
             update_fullscreen_button_text,
-            seek_video,
-            update_seek_bar,
             download_video,
             get_playback_speed,
             set_playback_speed,
@@ -91,7 +86,6 @@
         const currentTimeDisplay = document.getElementById('currentTime');
         const totalTimeDisplay = document.getElementById('totalTime');
         const videoPlayer = document.getElementById('videoPlayer');
-        const seekBar = document.getElementById('seekBar');
         const contextMenu = document.getElementById('contextMenu');
         const playbackSpeedMenu = document.getElementById('playbackSpeedMenu');
         let wasmInitialized = false;
@@ -119,10 +113,6 @@
             // Update duration if it changes (some video formats might report duration later)
             videoPlayer.addEventListener('durationchange', updateTimeDisplay);
 
-
-            // Update seek bar as video plays
-            videoPlayer.addEventListener('timeupdate', async () => await update_seek_bar());
-
             // Add event listeners for play/pause state
             videoPlayer.addEventListener('play', async () => await set_toggle_button_text('Pause'));
 
@@ -130,9 +120,6 @@
 
             // Add event listener for mute state changes
             videoPlayer.addEventListener('volumechange', async () => await update_mute_button_text());
-
-            // Add seek bar event listeners
-            seekBar.addEventListener('input', async () => await seek_video(parseFloat(seekBar.value)));
 
             // Add event listener for fullscreen state changes
             document.addEventListener('fullscreenchange', async () => await update_fullscreen_button_text());
@@ -165,6 +152,7 @@
         // Initialize WASM module
         init().then(async () => {
             await init_wasm();
+            await setupEventListeners();
         }).catch(error => {
             set_toggle_button_disabled(true);
         });
