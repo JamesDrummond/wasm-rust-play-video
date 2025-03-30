@@ -16,10 +16,5 @@ extern "C" {
 
 #[wasm_bindgen(start)]
 pub async fn init() -> Result<(), JsValue> {
-    let window = web_sys::window().ok_or_else(|| JsValue::from_str("Window not found"))?;
-    let document = window.document().ok_or_else(|| JsValue::from_str("Document not found"))?;
-    
-
-
     Ok(())
 }
