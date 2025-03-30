@@ -1,5 +1,4 @@
 use wasm_bindgen::prelude::*;
-use web_sys::{Document, Element, HtmlElement, Window};
 use crate::mock_client::MockHttpClient;
 use crate::post_client::fetch_post;
 
