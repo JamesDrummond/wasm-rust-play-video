@@ -1,13 +1,9 @@
 use wasm_bindgen::prelude::*;
-use web_sys::{
-    HtmlVideoElement,
-    HtmlElement
-};
+use web_sys::HtmlVideoElement;
 use crate::logger::Logger;
 use crate::player::error::{show_error, hide_error, VideoError};
 use crate::player::state::VIDEO_STATE;
 use crate::player::event_listeners::setup_event_listeners;
-use crate::player::playback_speed::{get_playback_speed, set_playback_speed, get_current_playback_speed, update_playback_speed_active_state};
 
 pub fn get_video_element() -> Result<HtmlVideoElement, VideoError> {
     let window = web_sys::window().ok_or(VideoError::WindowNotFound)?;
@@ -88,36 +84,6 @@ pub fn hide_menus() -> Result<(), JsValue> {
 pub fn init_video() -> Result<(), JsValue> {
     setup_event_listeners()?;
     set_wasm_initialized(true)?;
-    Ok(())
-}
-
-#[wasm_bindgen]
-pub fn toggle_context_menu(x: f64, y: f64) -> Result<(), JsValue> {
-    let window = web_sys::window().ok_or(VideoError::WindowNotFound)?;
-    let document = window.document().ok_or(VideoError::DocumentNotFound)?;
-    
-    let context_menu = document
-        .get_element_by_id("contextMenu")
-        .ok_or(VideoError::ElementNotFound("contextMenu".to_string()))?
-        .dyn_into::<HtmlElement>()?;
-
-    context_menu.set_attribute("style", &format!("left: {}px; top: {}px;", x, y))?;
-    context_menu.set_attribute("class", "context-menu show")?;
-    Ok(())
-}
-
-#[wasm_bindgen]
-pub fn toggle_playback_speed_menu(x: f64, y: f64) -> Result<(), JsValue> {
-    let window = web_sys::window().ok_or(VideoError::WindowNotFound)?;
-    let document = window.document().ok_or(VideoError::DocumentNotFound)?;
-    
-    let playback_speed_menu = document
-        .get_element_by_id("playbackSpeedMenu")
-        .ok_or(VideoError::ElementNotFound("playbackSpeedMenu".to_string()))?
-        .dyn_into::<HtmlElement>()?;
-
-    playback_speed_menu.set_attribute("style", &format!("left: {}px; top: {}px;", x, y))?;
-    playback_speed_menu.set_attribute("class", "playback-speed-menu show")?;
     Ok(())
 }
 
