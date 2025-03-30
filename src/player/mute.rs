@@ -66,6 +66,16 @@ pub fn update_mute_button_text() -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
+pub fn get_is_muted() -> bool {
+    Logger::info("Entering get_is_muted()").map_err(|e| {
+        let error = VideoError::VideoOperationFailed(e.to_string());
+        show_error(&error.to_string()).unwrap_or_default();
+        error
+    }).unwrap_or_default();
+    VIDEO_STATE.lock().unwrap().is_muted
+}
+
+#[wasm_bindgen]
 pub fn set_is_muted(value: bool) -> Result<(), JsValue> {
     Logger::info("Entering set_is_muted()").map_err(|e| {
         let error = VideoError::VideoOperationFailed(e.to_string());

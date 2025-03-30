@@ -57,16 +57,6 @@ pub fn set_wasm_initialized(value: bool) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn get_is_muted() -> bool {
-    Logger::info("Entering get_is_muted()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    }).unwrap_or_default();
-    VIDEO_STATE.lock().unwrap().is_muted
-}
-
-#[wasm_bindgen]
 pub fn get_playback_speed() -> Result<f64, JsValue> {
     Logger::info("Entering get_playback_speed()").map_err(|e| {
         let error = VideoError::VideoOperationFailed(e.to_string());
