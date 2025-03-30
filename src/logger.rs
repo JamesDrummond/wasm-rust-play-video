@@ -1,4 +1,3 @@
-use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 use web_sys::console;
 
@@ -28,6 +27,7 @@ impl From<LoggerError> for JsValue {
 pub struct Logger;
 
 impl Logger {
+    #[cfg(test)]
     pub fn log(message: &str) -> Result<(), LoggerError> {
         if message.is_empty() {
             return Err(LoggerError::InvalidMessage("Message cannot be empty".to_string()));
@@ -44,6 +44,7 @@ impl Logger {
         Ok(())
     }
 
+    #[cfg(test)]
     pub fn warn(message: &str) -> Result<(), LoggerError> {
         if message.is_empty() {
             return Err(LoggerError::InvalidMessage("Message cannot be empty".to_string()));
@@ -60,6 +61,7 @@ impl Logger {
         Ok(())
     }
 
+    #[cfg(test)]
     pub fn debug(message: &str) -> Result<(), LoggerError> {
         if message.is_empty() {
             return Err(LoggerError::InvalidMessage("Message cannot be empty".to_string()));
@@ -68,6 +70,7 @@ impl Logger {
         Ok(())
     }
 
+    #[cfg(test)]
     pub fn log_with_style(message: &str, style: &str) -> Result<(), LoggerError> {
         if message.is_empty() {
             return Err(LoggerError::InvalidMessage("Message cannot be empty".to_string()));

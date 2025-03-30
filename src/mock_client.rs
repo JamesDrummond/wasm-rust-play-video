@@ -13,7 +13,6 @@ static MOCK_RESPONSES: Lazy<Mutex<HashMap<String, MockResponse>>> =
             MockResponse {
                 status: 200,
                 body: "Hello, World!".to_string(),
-                headers: HashMap::new(),
             },
         );
         Mutex::new(map)
@@ -23,7 +22,6 @@ static MOCK_RESPONSES: Lazy<Mutex<HashMap<String, MockResponse>>> =
 pub struct MockResponse {
     status: u16,
     body: String,
-    headers: HashMap<String, String>,
 }
 
 #[wasm_bindgen]
@@ -34,7 +32,6 @@ impl MockHttpClient {
         let mock_response = MockResponse {
             status,
             body,
-            headers: HashMap::new(),
         };
         MOCK_RESPONSES.lock()
             .unwrap()

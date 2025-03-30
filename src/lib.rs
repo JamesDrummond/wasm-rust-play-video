@@ -1,13 +1,10 @@
 use wasm_bindgen::prelude::*;
-use web_sys::{Document, Element, HtmlElement, Window};
 
 mod mock_client;
 mod post_client;
 mod video;
 mod logger;
 mod example;
-use mock_client::MockHttpClient;
-use post_client::fetch_post;
 
 #[wasm_bindgen]
 extern "C" {

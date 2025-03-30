@@ -76,6 +76,7 @@ mod tests {
     }
 
     #[wasm_bindgen_test]
+    #[allow(dead_code)]
     async fn test_greet() {
         // Set up mock response
         let test_name = "TestUser";

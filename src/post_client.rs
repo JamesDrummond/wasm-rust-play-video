@@ -13,7 +13,7 @@ pub struct Post {
 
 #[wasm_bindgen]
 pub async fn fetch_post() -> Result<String, JsValue> {
-    let mut opts = RequestInit::new();
+    let opts = RequestInit::new();
     opts.set_method("GET");
     opts.set_mode(RequestMode::Cors);
 

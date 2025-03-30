@@ -2,9 +2,6 @@ use wasm_bindgen::prelude::*;
 use web_sys::{
     HtmlVideoElement,
     HtmlElement,
-    Window,
-    Document,
-    Element,
     Event,
 };
 use std::sync::Mutex;
@@ -49,8 +46,8 @@ pub static VIDEO_STATE: Lazy<Mutex<VideoState>> = Lazy::new(|| {
     })
 });
 
-#[derive(Default)]
-struct VideoState {
+#[derive(Clone)]
+pub struct VideoState {
     wasm_initialized: bool,
     is_muted: bool,
     playback_speed: f64,
