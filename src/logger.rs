@@ -84,4 +84,17 @@ impl Logger {
         console::log_2(&JsValue::from_str(&formatted), &style);
         Ok(())
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_logger_functions() {
+        assert!(Logger::log("Test log message").is_ok());
+        assert!(Logger::warn("Test warning message").is_ok());
+        assert!(Logger::debug("Test debug message").is_ok());
+        assert!(Logger::log_with_style("Test styled message", "color: red").is_ok());
+    }
 } 
