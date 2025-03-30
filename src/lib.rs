@@ -1,10 +1,8 @@
 use wasm_bindgen::prelude::*;
 
-mod mock_client;
-mod post_client;
-mod video;
+mod rest;
+mod player;
 mod logger;
-mod example;
 
 #[wasm_bindgen]
 extern "C" {

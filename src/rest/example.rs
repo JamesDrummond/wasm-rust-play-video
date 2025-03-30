@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
-use crate::mock_client::MockHttpClient;
-use crate::post_client::fetch_post;
+use super::mock_client::MockHttpClient;
+use super::post_client::fetch_post;
 
 #[wasm_bindgen]
 extern "C" {
