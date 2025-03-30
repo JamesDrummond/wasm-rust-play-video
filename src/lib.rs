@@ -4,7 +4,6 @@ use web_sys::{Document, Element, HtmlElement, Window};
 mod mock_client;
 mod post_client;
 mod video;
-mod video_js;
 mod logger;
 use mock_client::MockHttpClient;
 use post_client::fetch_post;
