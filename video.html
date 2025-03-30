@@ -79,12 +79,6 @@
             init_wasm
         } from './pkg/wasm_rust_play_video.js';
         
-        const errorMessage = document.getElementById('errorMessage');
-        const toggleButton = document.getElementById('toggleButton');
-        const muteButton = document.getElementById('muteButton');
-        const fullscreenButton = document.getElementById('fullscreenButton');
-        const currentTimeDisplay = document.getElementById('currentTime');
-        const totalTimeDisplay = document.getElementById('totalTime');
         const videoPlayer = document.getElementById('videoPlayer');
         const contextMenu = document.getElementById('contextMenu');
         const playbackSpeedMenu = document.getElementById('playbackSpeedMenu');
@@ -122,7 +116,7 @@
             videoPlayer.addEventListener('volumechange', async () => await update_mute_button_text());
 
             // Add event listener for fullscreen state changes
-            document.addEventListener('fullscreenchange', async () => await update_fullscreen_button_text());
+            videoPlayer.addEventListener('fullscreenchange', async () => await update_fullscreen_button_text());
         }
 
         // Define global functions for button clicks
