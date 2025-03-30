@@ -26,7 +26,8 @@ web-sys = { version = "0.3", features = [
     "Url",
     "console",
     "NodeList",
-    "DomRect"
+    "DomRect",
+    "Event"
 ] }
 js-sys = "0.3"
 once_cell = "1.18"

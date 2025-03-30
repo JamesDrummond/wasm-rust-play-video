@@ -5,6 +5,7 @@ use web_sys::{
     Window,
     Document,
     Element,
+    Event,
 };
 use std::sync::Mutex;
 use once_cell::sync::Lazy;
@@ -847,6 +848,39 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
         .get_element_by_id("videoPlayer")
         .ok_or(VideoError::ElementNotFound("videoPlayer".to_string()))?
         .dyn_into::<HtmlVideoElement>()?;
+
+    // Get menu elements
+    let context_menu = document
+        .get_element_by_id("contextMenu")
+        .ok_or(VideoError::ElementNotFound("contextMenu".to_string()))?;
+    
+    let playback_speed_menu = document
+        .get_element_by_id("playbackSpeedMenu")
+        .ok_or(VideoError::ElementNotFound("playbackSpeedMenu".to_string()))?;
+
+    // Click outside listener to close menus
+    {
+        let context_menu_clone = context_menu.clone();
+        let playback_speed_menu_clone = playback_speed_menu.clone();
+        
+        let closure = Closure::wrap(Box::new(move |event: Event| {
+            if let Some(target) = event.target() {
+                if let Ok(target_element) = target.dyn_into::<web_sys::Element>() {
+                    if !context_menu_clone.contains(Some(&target_element)) && 
+                       !playback_speed_menu_clone.contains(Some(&target_element)) {
+                        context_menu_clone.set_attribute("class", "context-menu").unwrap_or_default();
+                        playback_speed_menu_clone.set_attribute("class", "playback-speed-menu").unwrap_or_default();
+                    }
+                }
+            }
+        }) as Box<dyn FnMut(Event)>);
+        
+        document.add_event_listener_with_callback(
+            "click",
+            closure.as_ref().unchecked_ref(),
+        )?;
+        closure.forget();
+    }
 
     // Time update event listener
     {

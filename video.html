@@ -135,14 +135,6 @@
         window.downloadVideo = async() => await download_video();
         window.togglePictureInPicture = async() => await toggle_picture_in_picture();
 
-        // Close menus when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!contextMenu.contains(event.target) && !playbackSpeedMenu.contains(event.target)) {
-                contextMenu.classList.remove('show');
-                playbackSpeedMenu.classList.remove('show');
-            }
-        });
-
         // Initialize WASM module
         init().then(async () => {
             await init_wasm();
