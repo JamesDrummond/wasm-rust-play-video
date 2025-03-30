@@ -10,6 +10,7 @@ use crate::logger::Logger;
 use wasm_bindgen_futures::spawn_local;
 use crate::player::play_pause::{play_video, set_toggle_play};
 use crate::player::mute::{toggle_mute, update_mute_button_text};
+use crate::player::fullscreen::{toggle_fullscreen, update_fullscreen_button_text};
 
 #[derive(Debug)]
 pub enum VideoError {
@@ -72,52 +73,6 @@ pub fn get_element_by_id(id: &str) -> Result<web_sys::Element, VideoError> {
     document
         .get_element_by_id(id)
         .ok_or_else(|| VideoError::ElementNotFound(id.to_string()))
-}
-
-#[wasm_bindgen]
-pub fn toggle_fullscreen() -> Result<bool, JsValue> {
-    Logger::info("Entering toggle_fullscreen()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let window = web_sys::window().ok_or_else(|| {
-        let error = VideoError::WindowNotFound;
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let document = window.document().ok_or_else(|| {
-        let error = VideoError::DocumentNotFound;
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let video_element = get_video_element()?;
-    
-    if document.fullscreen_element().is_some() {
-        Logger::info("Exiting fullscreen mode")
-            .map_err(|e| {
-                let error = VideoError::VideoOperationFailed(e.to_string());
-                show_error(&error.to_string()).unwrap_or_default();
-                error
-            })?;
-        document.exit_fullscreen();
-        hide_error()?;
-        Ok(false)
-    } else {
-        Logger::info("Entering fullscreen mode")
-            .map_err(|e| {
-                let error = VideoError::VideoOperationFailed(e.to_string());
-                show_error(&error.to_string()).unwrap_or_default();
-                error
-            })?;
-        video_element.request_fullscreen().map_err(|e| {
-            let error = VideoError::VideoOperationFailed(format!("Failed to enter fullscreen: {:?}", e));
-            show_error(&error.to_string()).unwrap_or_default();
-            error
-        })?;
-        hide_error()?;
-        Ok(true)
-    }
 }
 
 #[wasm_bindgen]
@@ -185,26 +140,6 @@ pub fn format_time(seconds: f64) -> String {
     let minutes = (seconds / 60.0).floor() as i32;
     let remaining_seconds = (seconds % 60.0).floor() as i32;
     format!("{}:{:02}", minutes, remaining_seconds)
-}
-
-#[wasm_bindgen]
-pub fn is_fullscreen() -> Result<bool, JsValue> {
-    Logger::info("Entering is_fullscreen()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let window = web_sys::window().ok_or_else(|| {
-        let error = VideoError::WindowNotFound;
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let document = window.document().ok_or_else(|| {
-        let error = VideoError::DocumentNotFound;
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    Ok(document.fullscreen_element().is_some())
 }
 
 #[wasm_bindgen]
@@ -278,34 +213,6 @@ pub fn set_is_muted(value: bool) -> Result<(), JsValue> {
     if result.is_muted != value {
         result.is_muted = value;
     }
-    hide_error()?;
-    Ok(())
-}
-
-#[wasm_bindgen]
-pub fn set_fullscreen_button_text() -> Result<(), JsValue> {
-    Logger::info("Entering set_fullscreen_button_text()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let is_fullscreen = toggle_fullscreen()?;
-    let button = get_element_by_id("fullscreenButton")?;
-    button.set_text_content(Some(if is_fullscreen { "Exit Fullscreen" } else { "Fullscreen" }));
-    hide_error()?;
-    Ok(())
-}
-
-#[wasm_bindgen]
-pub fn update_fullscreen_button_text() -> Result<(), JsValue> {
-    Logger::info("Entering update_fullscreen_button_text()").map_err(|e| {
-        let error = VideoError::VideoOperationFailed(e.to_string());
-        show_error(&error.to_string()).unwrap_or_default();
-        error
-    })?;
-    let is_fullscreen = is_fullscreen()?;
-    let button = get_element_by_id("fullscreenButton")?;
-    button.set_text_content(Some(if is_fullscreen { "Exit Fullscreen" } else { "Fullscreen" }));
     hide_error()?;
     Ok(())
 }
