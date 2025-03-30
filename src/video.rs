@@ -1105,6 +1105,35 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
         closure.forget();
     }
 
+    // Speed options click event listeners
+    {
+        let speed_options = playback_speed_menu.query_selector_all(".speed-option")
+            .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get speed options: {:?}", e)))?;
+        
+        for i in 0..speed_options.length() {
+            let option = speed_options.get(i)
+                .ok_or_else(|| VideoError::ElementNotFound("Failed to get speed option".to_string()))?
+                .dyn_into::<web_sys::Element>()
+                .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to convert Node to Element: {:?}", e)))?;
+            
+            let text_content = option.text_content()
+                .ok_or_else(|| VideoError::VideoOperationFailed("No text content found".to_string()))?;
+            
+            let speed = text_content.replace('x', "").parse::<f64>()
+                .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to parse speed: {:?}", e)))?;
+            
+            let closure = Closure::wrap(Box::new(move || {
+                set_playback_speed(speed).unwrap_or_default();
+            }) as Box<dyn FnMut()>);
+            
+            option.add_event_listener_with_callback(
+                "click",
+                closure.as_ref().unchecked_ref(),
+            )?;
+            closure.forget();
+        }
+    }
+
     Ok(())
 }
 
