@@ -48,15 +48,16 @@
     <script type="module">
         import init, { 
             set_toggle_button_disabled,
-            init_wasm
+            init_video
         } from './pkg/wasm_rust_play_video.js';
         
         // Initialize WASM module
         init().then(async () => {
-            await init_wasm();
+            await init_video();
         }).catch(error => {
             set_toggle_button_disabled(true);
         });
+        
     </script>
 </body>
 </html> 

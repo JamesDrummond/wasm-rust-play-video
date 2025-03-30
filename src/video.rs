@@ -1150,7 +1150,7 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn init_wasm() -> Result<(), JsValue> {
+pub fn init_video() -> Result<(), JsValue> {
     setup_event_listeners()?;
     set_wasm_initialized(true)?;
     Ok(())

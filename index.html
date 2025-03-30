@@ -12,10 +12,11 @@
     <button id="fetchPost">Fetch Post</button>
     <div id="postContent" class="post-content"></div>
     <script type="module">
-        import init from './pkg/wasm_rust_play_video.js';
+        import init, { init_example } from './pkg/wasm_rust_play_video.js';
 
         async function run() {
             await init();
+            await init_example();
         }
 
         run();
