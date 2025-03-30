@@ -10,7 +10,7 @@ pub mod download;
 
 pub use error::VideoError;
 pub use fullscreen::toggle_fullscreen;
-pub use menu::position_playback_speed_menu;
+pub use menu::{position_playback_speed_menu, position_context_menu};
 pub use mute::toggle_mute;
 pub use play_pause::play_video;
 pub use state::VIDEO_STATE;
@@ -26,7 +26,6 @@ pub use video::{
     get_current_playback_speed,
     update_playback_speed_active_state,
     hide_menus,
-    position_context_menu,
     setup_event_listeners,
     init_video,
     toggle_context_menu,
