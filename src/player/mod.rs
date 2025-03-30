@@ -7,6 +7,7 @@ pub mod state;
 pub mod time;
 pub mod video;
 pub mod download;
+pub mod event_listeners;
 
 pub use error::VideoError;
 pub use fullscreen::toggle_fullscreen;
@@ -15,6 +16,7 @@ pub use mute::toggle_mute;
 pub use play_pause::play_video;
 pub use state::VIDEO_STATE;
 pub use time::update_time_display;
+pub use event_listeners::setup_event_listeners;
 pub use video::{
     get_video_element,
     get_element_by_id,
@@ -26,7 +28,6 @@ pub use video::{
     get_current_playback_speed,
     update_playback_speed_active_state,
     hide_menus,
-    setup_event_listeners,
     init_video,
     toggle_context_menu,
     toggle_playback_speed_menu,
