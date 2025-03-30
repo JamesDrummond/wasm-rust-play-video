@@ -86,7 +86,7 @@ mod tests {
     #[wasm_bindgen_test]
     async fn test_mock_client_error() {
         let client = MockHttpClient;
-        let test_url = "/api/greet?name=Error";
+        let test_url = "/api/Error?name=Error";
         
         MockHttpClient::mock_response(test_url, 404, "Not Found".to_string());
 
