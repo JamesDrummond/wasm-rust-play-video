@@ -1035,6 +1035,75 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
         closure.forget();
     }
 
+    // Context menu download button click event listener
+    {
+        let closure = Closure::wrap(Box::new(move || {
+            let download = download_video();
+            spawn_local(async move {
+                download.await.unwrap_or_default();
+            });
+        }) as Box<dyn FnMut()>);
+        
+        let download_button = document
+            .get_element_by_id("contextMenu")
+            .ok_or(VideoError::ElementNotFound("contextMenu".to_string()))?
+            .query_selector(".context-menu-item")
+            .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get download button: {:?}", e)))?
+            .ok_or(VideoError::ElementNotFound("download button".to_string()))?;
+            
+        download_button.add_event_listener_with_callback(
+            "click",
+            closure.as_ref().unchecked_ref(),
+        )?;
+        closure.forget();
+    }
+
+    // Context menu playback speed button click event listener
+    {
+        let closure = Closure::wrap(Box::new(move |event: Event| {
+            if let Some(target) = event.target() {
+                if let Ok(target_element) = target.dyn_into::<web_sys::Element>() {
+                    let rect = target_element.get_bounding_client_rect();
+                    let _ = position_playback_speed_menu(rect.right(), rect.bottom());
+                }
+            }
+        }) as Box<dyn FnMut(Event)>);
+        
+        let playback_speed_button = document
+            .get_element_by_id("contextMenu")
+            .ok_or(VideoError::ElementNotFound("contextMenu".to_string()))?
+            .query_selector_all(".context-menu-item")
+            .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get playback speed button: {:?}", e)))?
+            .get(1)
+            .ok_or(VideoError::ElementNotFound("playback speed button".to_string()))?;
+            
+        playback_speed_button.add_event_listener_with_callback(
+            "click",
+            closure.as_ref().unchecked_ref(),
+        )?;
+        closure.forget();
+    }
+
+    // Context menu picture-in-picture button click event listener
+    {
+        let closure = Closure::wrap(Box::new(move || {
+            toggle_picture_in_picture().unwrap_or_default();
+        }) as Box<dyn FnMut()>);
+        
+        let pip_button = document
+            .get_element_by_id("contextMenu")
+            .ok_or(VideoError::ElementNotFound("contextMenu".to_string()))?
+            .query_selector_all(".context-menu-item")
+            .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get pip button: {:?}", e)))?
+            .get(2)
+            .ok_or(VideoError::ElementNotFound("pip button".to_string()))?;
+            
+        pip_button.add_event_listener_with_callback(
+            "click",
+            closure.as_ref().unchecked_ref(),
+        )?;
+        closure.forget();
+    }
 
     Ok(())
 }
