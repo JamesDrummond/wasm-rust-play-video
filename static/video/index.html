@@ -48,12 +48,12 @@
     <script type="module">
         import init, { 
             show_error,
-            init_video
+            init_player
         } from '../../pkg/wasm_rust_play_video.js';
         
         // Initialize WASM module
         init().then(async () => {
-            await init_video();
+            await init_player();
         }).catch(error => {
             show_error("Failed to initialize video player. Please refresh the page.");
         });

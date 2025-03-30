@@ -54,7 +54,7 @@ pub fn set_wasm_initialized(value: bool) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn init_video() -> Result<(), JsValue> {
+pub fn init_player() -> Result<(), JsValue> {
     setup_event_listeners()?;
     set_wasm_initialized(true)?;
     Ok(())
