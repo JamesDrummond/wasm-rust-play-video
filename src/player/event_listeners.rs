@@ -11,7 +11,8 @@ use crate::player::error::VideoError;
 use crate::player::time::update_time_display;
 use crate::player::download::download_video;
 use crate::player::menu::{position_playback_speed_menu, position_context_menu};
-use crate::player::video::{toggle_picture_in_picture, set_playback_speed};
+use crate::player::video::toggle_picture_in_picture;
+use crate::player::playback_speed::set_playback_speed;
 
 #[wasm_bindgen]
 pub fn setup_event_listeners() -> Result<(), JsValue> {
