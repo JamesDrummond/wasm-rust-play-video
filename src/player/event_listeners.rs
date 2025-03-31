@@ -14,6 +14,21 @@ use crate::player::menu::{position_playback_speed_menu, position_context_menu};
 use crate::player::picture_in_picture::toggle_picture_in_picture;
 use crate::player::playback_speed::set_playback_speed;
 use crate::player::ElementIds;
+use crate::player::element_ids::ElementClasses;
+
+// Event name constants
+const EVENT_CLICK: &str = "click";
+const EVENT_TIMEUPDATE: &str = "timeupdate";
+const EVENT_LOADEDMETADATA: &str = "loadedmetadata";
+const EVENT_DURATIONCHANGE: &str = "durationchange";
+const EVENT_PLAY: &str = "play";
+const EVENT_PAUSE: &str = "pause";
+const EVENT_VOLUMECHANGE: &str = "volumechange";
+const EVENT_FULLSCREENCHANGE: &str = "fullscreenchange";
+
+// Button text constants
+const BUTTON_TEXT_PLAY: &str = "Play";
+const BUTTON_TEXT_PAUSE: &str = "Pause";
 
 #[wasm_bindgen]
 pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
@@ -22,37 +37,40 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
     
     let video_player = document
         .get_element_by_id(&element_ids.video_player())
-        .ok_or(VideoError::ElementNotFound(element_ids.video_player().clone()))?
+        .ok_or(VideoError::ElementNotFound(element_ids.video_player()))?
         .dyn_into::<HtmlVideoElement>()?;
 
     // Get menu elements
     let context_menu = document
         .get_element_by_id(&element_ids.context_menu())
-        .ok_or(VideoError::ElementNotFound(element_ids.context_menu().clone()))?;
+        .ok_or(VideoError::ElementNotFound(element_ids.context_menu()))?;
     
     let playback_speed_menu = document
         .get_element_by_id(&element_ids.playback_speed_menu())
-        .ok_or(VideoError::ElementNotFound(element_ids.playback_speed_menu().clone()))?;
+        .ok_or(VideoError::ElementNotFound(element_ids.playback_speed_menu()))?;
+
+    let element_classes = ElementClasses::new();
 
     // Click outside listener to close menus
     {
         let context_menu_clone = context_menu.clone();
         let playback_speed_menu_clone = playback_speed_menu.clone();
+        let element_classes_clone = element_classes.clone();
         
         let closure = Closure::wrap(Box::new(move |event: Event| {
             if let Some(target) = event.target() {
                 if let Ok(target_element) = target.dyn_into::<web_sys::Element>() {
                     if !context_menu_clone.contains(Some(&target_element)) && 
                        !playback_speed_menu_clone.contains(Some(&target_element)) {
-                        context_menu_clone.set_attribute("class", "context-menu").unwrap_or_default();
-                        playback_speed_menu_clone.set_attribute("class", "playback-speed-menu").unwrap_or_default();
+                        context_menu_clone.set_attribute("class", &element_classes_clone.context_menu()).unwrap_or_default();
+                        playback_speed_menu_clone.set_attribute("class", &element_classes_clone.playback_speed_menu()).unwrap_or_default();
                     }
                 }
             }
         }) as Box<dyn FnMut(_)>);
 
         document.add_event_listener_with_callback(
-            "click",
+            EVENT_CLICK,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -67,7 +85,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             });
         }) as Box<dyn FnMut()>);
         video_player.add_event_listener_with_callback(
-            "timeupdate",
+            EVENT_TIMEUPDATE,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -82,7 +100,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             });
         }) as Box<dyn FnMut()>);
         video_player.add_event_listener_with_callback(
-            "loadedmetadata",
+            EVENT_LOADEDMETADATA,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -97,7 +115,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             });
         }) as Box<dyn FnMut()>);
         video_player.add_event_listener_with_callback(
-            "durationchange",
+            EVENT_DURATIONCHANGE,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -106,13 +124,13 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
     // Play event listener
     {
         let closure = Closure::wrap(Box::new(move || {
-            let set_text = set_toggle_play("Pause");
+            let set_text = set_toggle_play(BUTTON_TEXT_PAUSE);
             spawn_local(async move {
                 set_text.await.unwrap_or_default();
             });
         }) as Box<dyn FnMut()>);
         video_player.add_event_listener_with_callback(
-            "play",
+            EVENT_PLAY,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -121,13 +139,13 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
     // Pause event listener
     {
         let closure = Closure::wrap(Box::new(move || {
-            let set_text = set_toggle_play("Play");
+            let set_text = set_toggle_play(BUTTON_TEXT_PLAY);
             spawn_local(async move {
                 set_text.await.unwrap_or_default();
             });
         }) as Box<dyn FnMut()>);
         video_player.add_event_listener_with_callback(
-            "pause",
+            EVENT_PAUSE,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -139,7 +157,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             update_mute_button_text().unwrap_or_default();
         }) as Box<dyn FnMut()>);
         video_player.add_event_listener_with_callback(
-            "volumechange",
+            EVENT_VOLUMECHANGE,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -151,7 +169,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             update_fullscreen_button_text().unwrap_or_default();
         }) as Box<dyn FnMut()>);
         document.add_event_listener_with_callback(
-            "fullscreenchange",
+            EVENT_FULLSCREENCHANGE,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -171,7 +189,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             .ok_or(VideoError::ElementNotFound(element_ids.toggle_button()))?;
             
         toggle_button.add_event_listener_with_callback(
-            "click",
+            EVENT_CLICK,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -188,7 +206,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             .ok_or(VideoError::ElementNotFound(element_ids.mute_button()))?;
             
         mute_button.add_event_listener_with_callback(
-            "click",
+            EVENT_CLICK,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -205,7 +223,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             .ok_or(VideoError::ElementNotFound(element_ids.fullscreen_button()))?;
             
         fullscreen_button.add_event_listener_with_callback(
-            "click",
+            EVENT_CLICK,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -223,12 +241,12 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         let download_button = document
             .get_element_by_id(&element_ids.context_menu())
             .ok_or(VideoError::ElementNotFound(element_ids.context_menu()))?
-            .query_selector(".context-menu-item")
+            .query_selector(&format!(".{}", element_classes.context_menu_item()))
             .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get download button: {:?}", e)))?
             .ok_or(VideoError::ElementNotFound("download button".to_string()))?;
             
         download_button.add_event_listener_with_callback(
-            "click",
+            EVENT_CLICK,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -248,13 +266,13 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         let playback_speed_button = document
             .get_element_by_id(&element_ids.context_menu())
             .ok_or(VideoError::ElementNotFound(element_ids.context_menu()))?
-            .query_selector_all(".context-menu-item")
+            .query_selector_all(&format!(".{}", element_classes.context_menu_item()))
             .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get playback speed button: {:?}", e)))?
             .get(1)
             .ok_or(VideoError::ElementNotFound("playback speed button".to_string()))?;
             
         playback_speed_button.add_event_listener_with_callback(
-            "click",
+            EVENT_CLICK,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -269,13 +287,13 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         let pip_button = document
             .get_element_by_id(&element_ids.context_menu())
             .ok_or(VideoError::ElementNotFound(element_ids.context_menu()))?
-            .query_selector_all(".context-menu-item")
+            .query_selector_all(&format!(".{}", element_classes.context_menu_item()))
             .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get pip button: {:?}", e)))?
             .get(2)
             .ok_or(VideoError::ElementNotFound("pip button".to_string()))?;
             
         pip_button.add_event_listener_with_callback(
-            "click",
+            EVENT_CLICK,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();
@@ -283,7 +301,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
 
     // Speed options click event listeners
     {
-        let speed_options = playback_speed_menu.query_selector_all(".speed-option")
+        let speed_options = playback_speed_menu.query_selector_all(&format!(".{}", element_classes.speed_option()))
             .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get speed options: {:?}", e)))?;
         
         for i in 0..speed_options.length() {
@@ -303,7 +321,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             }) as Box<dyn FnMut()>);
             
             option.add_event_listener_with_callback(
-                "click",
+                EVENT_CLICK,
                 closure.as_ref().unchecked_ref(),
             )?;
             closure.forget();
@@ -326,7 +344,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             .ok_or(VideoError::ElementNotFound(element_ids.menu_button()))?;
             
         menu_button.add_event_listener_with_callback(
-            "click",
+            EVENT_CLICK,
             closure.as_ref().unchecked_ref(),
         )?;
         closure.forget();

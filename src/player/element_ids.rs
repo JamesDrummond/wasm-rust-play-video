@@ -16,6 +16,56 @@ pub struct ElementIds {
 }
 
 #[wasm_bindgen]
+#[derive(Clone)]
+pub struct ElementClasses {
+    pub(crate) context_menu: String,
+    pub(crate) context_menu_show: String,
+    pub(crate) playback_speed_menu: String,
+    pub(crate) playback_speed_menu_show: String,
+    pub(crate) speed_option: String,
+    pub(crate) context_menu_item: String,
+}
+
+#[wasm_bindgen]
+impl ElementClasses {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> ElementClasses {
+        ElementClasses {
+            context_menu: "context-menu".to_string(),
+            context_menu_show: "context-menu show".to_string(),
+            playback_speed_menu: "playback-speed-menu".to_string(),
+            playback_speed_menu_show: "playback-speed-menu show".to_string(),
+            speed_option: "speed-option".to_string(),
+            context_menu_item: "context-menu-item".to_string(),
+        }
+    }
+
+    pub fn context_menu(&self) -> String {
+        self.context_menu.clone()
+    }
+
+    pub fn context_menu_show(&self) -> String {
+        self.context_menu_show.clone()
+    }
+
+    pub fn playback_speed_menu(&self) -> String {
+        self.playback_speed_menu.clone()
+    }
+
+    pub fn playback_speed_menu_show(&self) -> String {
+        self.playback_speed_menu_show.clone()
+    }
+
+    pub fn speed_option(&self) -> String {
+        self.speed_option.clone()
+    }
+
+    pub fn context_menu_item(&self) -> String {
+        self.context_menu_item.clone()
+    }
+}
+
+#[wasm_bindgen]
 impl ElementIds {
     #[wasm_bindgen(constructor)]
     pub fn new(
