@@ -30,6 +30,15 @@ const EVENT_FULLSCREENCHANGE: &str = "fullscreenchange";
 const BUTTON_TEXT_PLAY: &str = "Play";
 const BUTTON_TEXT_PAUSE: &str = "Pause";
 
+// Error message constants
+const ERROR_DOWNLOAD_BUTTON_NOT_FOUND: &str = "download button";
+const ERROR_PLAYBACK_SPEED_BUTTON_NOT_FOUND: &str = "playback speed button";
+const ERROR_PIP_BUTTON_NOT_FOUND: &str = "pip button";
+const ERROR_SPEED_OPTION_NOT_FOUND: &str = "Failed to get speed option";
+const ERROR_NODE_TO_ELEMENT_CONVERSION: &str = "Failed to convert Node to Element";
+const ERROR_NO_TEXT_CONTENT: &str = "No text content found";
+const ERROR_SPEED_PARSE: &str = "Failed to parse speed";
+
 #[wasm_bindgen]
 pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
     let window = web_sys::window().ok_or(VideoError::WindowNotFound)?;
@@ -243,7 +252,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             .ok_or(VideoError::ElementNotFound(element_ids.context_menu()))?
             .query_selector(&format!(".{}", element_classes.context_menu_item()))
             .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get download button: {:?}", e)))?
-            .ok_or(VideoError::ElementNotFound("download button".to_string()))?;
+            .ok_or(VideoError::ElementNotFound(ERROR_DOWNLOAD_BUTTON_NOT_FOUND.to_string()))?;
             
         download_button.add_event_listener_with_callback(
             EVENT_CLICK,
@@ -269,7 +278,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             .query_selector_all(&format!(".{}", element_classes.context_menu_item()))
             .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get playback speed button: {:?}", e)))?
             .get(1)
-            .ok_or(VideoError::ElementNotFound("playback speed button".to_string()))?;
+            .ok_or(VideoError::ElementNotFound(ERROR_PLAYBACK_SPEED_BUTTON_NOT_FOUND.to_string()))?;
             
         playback_speed_button.add_event_listener_with_callback(
             EVENT_CLICK,
@@ -290,7 +299,7 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
             .query_selector_all(&format!(".{}", element_classes.context_menu_item()))
             .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get pip button: {:?}", e)))?
             .get(2)
-            .ok_or(VideoError::ElementNotFound("pip button".to_string()))?;
+            .ok_or(VideoError::ElementNotFound(ERROR_PIP_BUTTON_NOT_FOUND.to_string()))?;
             
         pip_button.add_event_listener_with_callback(
             EVENT_CLICK,
@@ -306,15 +315,15 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         
         for i in 0..speed_options.length() {
             let option = speed_options.get(i)
-                .ok_or_else(|| VideoError::ElementNotFound("Failed to get speed option".to_string()))?
+                .ok_or_else(|| VideoError::ElementNotFound(ERROR_SPEED_OPTION_NOT_FOUND.to_string()))?
                 .dyn_into::<web_sys::Element>()
-                .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to convert Node to Element: {:?}", e)))?;
+                .map_err(|e| VideoError::VideoOperationFailed(format!("{}: {:?}", ERROR_NODE_TO_ELEMENT_CONVERSION, e)))?;
             
             let text_content = option.text_content()
-                .ok_or_else(|| VideoError::VideoOperationFailed("No text content found".to_string()))?;
+                .ok_or_else(|| VideoError::VideoOperationFailed(ERROR_NO_TEXT_CONTENT.to_string()))?;
             
             let speed = text_content.replace('x', "").parse::<f64>()
-                .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to parse speed: {:?}", e)))?;
+                .map_err(|e| VideoError::VideoOperationFailed(format!("{}: {:?}", ERROR_SPEED_PARSE, e)))?;
             
             let closure = Closure::wrap(Box::new(move || {
                 set_playback_speed(speed).unwrap_or_default();
