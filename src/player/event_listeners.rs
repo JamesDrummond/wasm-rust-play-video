@@ -13,25 +13,26 @@ use crate::player::download::download_video;
 use crate::player::menu::{position_playback_speed_menu, position_context_menu};
 use crate::player::picture_in_picture::toggle_picture_in_picture;
 use crate::player::playback_speed::set_playback_speed;
+use crate::player::ElementIds;
 
 #[wasm_bindgen]
-pub fn setup_event_listeners() -> Result<(), JsValue> {
+pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
     let window = web_sys::window().ok_or(VideoError::WindowNotFound)?;
     let document = window.document().ok_or(VideoError::DocumentNotFound)?;
     
     let video_player = document
-        .get_element_by_id("videoPlayer")
-        .ok_or(VideoError::ElementNotFound("videoPlayer".to_string()))?
+        .get_element_by_id(&element_ids.video_player())
+        .ok_or(VideoError::ElementNotFound(element_ids.video_player()))?
         .dyn_into::<HtmlVideoElement>()?;
 
     // Get menu elements
     let context_menu = document
-        .get_element_by_id("contextMenu")
-        .ok_or(VideoError::ElementNotFound("contextMenu".to_string()))?;
+        .get_element_by_id(&element_ids.context_menu())
+        .ok_or(VideoError::ElementNotFound(element_ids.context_menu()))?;
     
     let playback_speed_menu = document
-        .get_element_by_id("playbackSpeedMenu")
-        .ok_or(VideoError::ElementNotFound("playbackSpeedMenu".to_string()))?;
+        .get_element_by_id(&element_ids.playback_speed_menu())
+        .ok_or(VideoError::ElementNotFound(element_ids.playback_speed_menu()))?;
 
     // Click outside listener to close menus
     {
@@ -48,8 +49,8 @@ pub fn setup_event_listeners() -> Result<(), JsValue> {
                     }
                 }
             }
-        }) as Box<dyn FnMut(Event)>);
-        
+        }) as Box<dyn FnMut(_)>);
+
         document.add_event_listener_with_callback(
             "click",
             closure.as_ref().unchecked_ref(),

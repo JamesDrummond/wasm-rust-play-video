@@ -1,13 +1,14 @@
 use wasm_bindgen::prelude::*;
-use web_sys::HtmlVideoElement;
-use crate::player::error::{ VideoError};
+use crate::player::error::VideoError;
 use crate::player::event_listeners::setup_event_listeners;
 mod dom;
 pub use dom::{get_video_element, get_element_by_id};
+mod element_ids;
+pub use element_ids::ElementIds;
 
 #[wasm_bindgen]
-pub fn init_video_player() -> Result<(), VideoError> {
-    setup_event_listeners().map_err(|e| 
+pub fn init_video_player(element_ids: ElementIds) -> Result<(), VideoError> {
+    setup_event_listeners(element_ids).map_err(|e| 
         VideoError::VideoOperationFailed(format!("Failed to setup event listeners: {:?}", e)))?;
     Ok(())
 }
