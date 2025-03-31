@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 use crate::logger::Logger;
 use crate::player::error::{show_error, hide_error, VideoError};
-use crate::player::player::get_element_by_id;
+use crate::player::get_element_by_id;
 
 #[wasm_bindgen]
 pub fn position_context_menu(event_x: f64, event_y: f64) -> Result<(), JsValue> {

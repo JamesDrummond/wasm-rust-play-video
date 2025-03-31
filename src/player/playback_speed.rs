@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::*;
 use crate::logger::Logger;
 use crate::player::error::{show_error, hide_error, VideoError};
 use crate::player::state::VIDEO_STATE;
-use crate::player::player::{get_video_element, get_element_by_id};
+use crate::player::{get_video_element, get_element_by_id};
 use crate::player::menu::hide_menus;
 
 #[wasm_bindgen]
