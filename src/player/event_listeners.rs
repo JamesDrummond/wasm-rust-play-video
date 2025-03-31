@@ -22,17 +22,17 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
     
     let video_player = document
         .get_element_by_id(&element_ids.video_player())
-        .ok_or(VideoError::ElementNotFound(element_ids.video_player()))?
+        .ok_or(VideoError::ElementNotFound(element_ids.video_player().clone()))?
         .dyn_into::<HtmlVideoElement>()?;
 
     // Get menu elements
     let context_menu = document
         .get_element_by_id(&element_ids.context_menu())
-        .ok_or(VideoError::ElementNotFound(element_ids.context_menu()))?;
+        .ok_or(VideoError::ElementNotFound(element_ids.context_menu().clone()))?;
     
     let playback_speed_menu = document
         .get_element_by_id(&element_ids.playback_speed_menu())
-        .ok_or(VideoError::ElementNotFound(element_ids.playback_speed_menu()))?;
+        .ok_or(VideoError::ElementNotFound(element_ids.playback_speed_menu().clone()))?;
 
     // Click outside listener to close menus
     {
@@ -167,8 +167,8 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         }) as Box<dyn FnMut()>);
         
         let toggle_button = document
-            .get_element_by_id("toggleButton")
-            .ok_or(VideoError::ElementNotFound("toggleButton".to_string()))?;
+            .get_element_by_id(&element_ids.toggle_button())
+            .ok_or(VideoError::ElementNotFound(element_ids.toggle_button()))?;
             
         toggle_button.add_event_listener_with_callback(
             "click",
@@ -184,8 +184,8 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         }) as Box<dyn FnMut()>);
         
         let mute_button = document
-            .get_element_by_id("muteButton")
-            .ok_or(VideoError::ElementNotFound("muteButton".to_string()))?;
+            .get_element_by_id(&element_ids.mute_button())
+            .ok_or(VideoError::ElementNotFound(element_ids.mute_button()))?;
             
         mute_button.add_event_listener_with_callback(
             "click",
@@ -201,8 +201,8 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         }) as Box<dyn FnMut()>);
         
         let fullscreen_button = document
-            .get_element_by_id("fullscreenButton")
-            .ok_or(VideoError::ElementNotFound("fullscreenButton".to_string()))?;
+            .get_element_by_id(&element_ids.fullscreen_button())
+            .ok_or(VideoError::ElementNotFound(element_ids.fullscreen_button()))?;
             
         fullscreen_button.add_event_listener_with_callback(
             "click",
@@ -221,8 +221,8 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         }) as Box<dyn FnMut()>);
         
         let download_button = document
-            .get_element_by_id("contextMenu")
-            .ok_or(VideoError::ElementNotFound("contextMenu".to_string()))?
+            .get_element_by_id(&element_ids.context_menu())
+            .ok_or(VideoError::ElementNotFound(element_ids.context_menu()))?
             .query_selector(".context-menu-item")
             .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get download button: {:?}", e)))?
             .ok_or(VideoError::ElementNotFound("download button".to_string()))?;
@@ -246,8 +246,8 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         }) as Box<dyn FnMut(Event)>);
         
         let playback_speed_button = document
-            .get_element_by_id("contextMenu")
-            .ok_or(VideoError::ElementNotFound("contextMenu".to_string()))?
+            .get_element_by_id(&element_ids.context_menu())
+            .ok_or(VideoError::ElementNotFound(element_ids.context_menu()))?
             .query_selector_all(".context-menu-item")
             .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get playback speed button: {:?}", e)))?
             .get(1)
@@ -267,8 +267,8 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         }) as Box<dyn FnMut()>);
         
         let pip_button = document
-            .get_element_by_id("contextMenu")
-            .ok_or(VideoError::ElementNotFound("contextMenu".to_string()))?
+            .get_element_by_id(&element_ids.context_menu())
+            .ok_or(VideoError::ElementNotFound(element_ids.context_menu()))?
             .query_selector_all(".context-menu-item")
             .map_err(|e| VideoError::VideoOperationFailed(format!("Failed to get pip button: {:?}", e)))?
             .get(2)
@@ -322,8 +322,8 @@ pub fn setup_event_listeners(element_ids: ElementIds) -> Result<(), JsValue> {
         }) as Box<dyn FnMut(Event)>);
         
         let menu_button = document
-            .get_element_by_id("menuButton")
-            .ok_or(VideoError::ElementNotFound("menuButton".to_string()))?;
+            .get_element_by_id(&element_ids.menu_button())
+            .ok_or(VideoError::ElementNotFound(element_ids.menu_button()))?;
             
         menu_button.add_event_listener_with_callback(
             "click",

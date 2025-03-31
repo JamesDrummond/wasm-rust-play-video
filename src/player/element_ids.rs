@@ -48,6 +48,34 @@ impl ElementIds {
         self.video_player.to_string()
     }
 
+    pub fn toggle_button(&self) -> String {
+        self.toggle_button.to_string()
+    }
+
+    pub fn mute_button(&self) -> String {
+        self.mute_button.to_string()
+    }
+
+    pub fn fullscreen_button(&self) -> String {
+        self.fullscreen_button.to_string()
+    }
+
+    pub fn menu_button(&self) -> String {
+        self.menu_button.to_string()
+    }
+
+    pub fn current_time(&self) -> String {
+        self.current_time.to_string()
+    }
+
+    pub fn total_time(&self) -> String {
+        self.total_time.to_string()
+    }
+
+    pub fn error_message(&self) -> String {
+        self.error_message.to_string()
+    }
+
     pub fn context_menu(&self) -> String {
         self.context_menu.to_string()
     }
