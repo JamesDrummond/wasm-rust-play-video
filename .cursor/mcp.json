@@ -1,0 +1,13 @@
+{
+    "firebase-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@gannonh/firebase-mcp"
+      ],
+      "env": {
+        "SERVICE_ACCOUNT_KEY_PATH": "D:\\Users\\ReddeR\\Source\\repos\\divym-456223-8fa9a8f874fd.json",
+        "FIREBASE_STORAGE_BUCKET": "divym-456223.firebasestorage.app"
+      }
+    }
+  }
